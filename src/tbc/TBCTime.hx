@@ -1,4 +1,4 @@
-package tbc ;
+package tbc;
 import tbc.TBC ;
 
 import haxe.Timer ;

@@ -1,4 +1,4 @@
-package tbc ;
+package tbc;
 
 interface ProcessI<A> {
     public function bind<B>( f : A -> Process<B> ) : Process<B> ;

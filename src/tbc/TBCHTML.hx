@@ -1,4 +1,4 @@
-package tbc ;
+package tbc;
 
 /** Module TCBHTML */
 
