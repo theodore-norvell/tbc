@@ -8,4 +8,4 @@ for designing the control aspect of graphical user interfaces and asynchronous c
 The implementation is in Haxe, but the intention is to export a library that can be used directly from JavaScript and perhaps
 other languages.
 
-More info can be found in my blog post at http://sourcephile.blogspot.ca/... .
+More info can be found in my blog post at http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html .
