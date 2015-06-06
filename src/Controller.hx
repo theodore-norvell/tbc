@@ -31,6 +31,11 @@ class Controller {
     static function out1A( ev : Event ) { Log.trace( "1A" ) ; return skip() ;}
     static function out1B( ev : Event ) { Log.trace( "1B" ) ; return skip() ;}
     static function out2( ev : Event ) { Log.trace( "2" ) ; return skip() ;}
+    static function tooLate( triv : Triv ) { Log.trace( "too slow" ) ; return skip() ;}
+    static function nagTheUser(  ) : Triv {
+        Log.trace( "Hurry up" ) ; return null ; }
+    static function thankTheUser(  ) : Triv {
+        Log.trace( "Thankyou" ) ; return null ; }
 
     static function tryEx() : Process<Void> { return exec(f) ; }
     static function tryPar() : Process<Pair<Triv,Triv>> { return
@@ -50,9 +55,18 @@ class Controller {
                 click( b1a ) >> out1A
             ,
                 click( b1b ) >> out1B
+            ,
+                timeout( 2000 ) >> tooLate
             ) >
             pause(1000) >
             await( click( b2 ) >> out2 ) 
+        ) ; }
+
+    static function nag(triv : Triv) : Process<Triv>{ return
+        await(
+            click(b0) && exec(thankTheUser)
+        ,
+            timeout( 1000 ) && exec(nagTheUser) >= nag
         ) ; }
 
     static public function onload() {
@@ -63,6 +77,6 @@ class Controller {
         b1b = cast(doc.getElementById( "button:oneB" ), ButtonElement)  ;
         b2 = cast(doc.getElementById( "button:two" ), ButtonElement)  ;
         Log.trace("hello");
-        tryPar().sc(useCase()).go( function(x:Triv) :Int { return 42 ; }  ) ;
+        (nag(null)).go( function(x:Triv) : Void { }  ) ;
     }
 }

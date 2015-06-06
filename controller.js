@@ -15,31 +15,43 @@ Controller.main = function() {
 	body.onload = Controller.onload;
 };
 Controller.f = function() {
-	haxe_Log.trace("X",{ fileName : "Controller.hx", lineNumber : 26, className : "Controller", methodName : "f"});
+	haxe_Log.trace("X",{ fileName : "Controller.hx", lineNumber : 27, className : "Controller", methodName : "f"});
 };
 Controller.outX = function() {
-	haxe_Log.trace("XX",{ fileName : "Controller.hx", lineNumber : 27, className : "Controller", methodName : "outX"});
+	haxe_Log.trace("XX",{ fileName : "Controller.hx", lineNumber : 28, className : "Controller", methodName : "outX"});
 	return null;
 };
 Controller.outY = function() {
-	haxe_Log.trace("Y",{ fileName : "Controller.hx", lineNumber : 28, className : "Controller", methodName : "outY"});
+	haxe_Log.trace("Y",{ fileName : "Controller.hx", lineNumber : 29, className : "Controller", methodName : "outY"});
 	return null;
 };
 Controller.out0 = function(ev) {
-	haxe_Log.trace("0",{ fileName : "Controller.hx", lineNumber : 29, className : "Controller", methodName : "out0"});
+	haxe_Log.trace("0",{ fileName : "Controller.hx", lineNumber : 30, className : "Controller", methodName : "out0"});
 	return tbc_TBC.skip();
 };
 Controller.out1A = function(ev) {
-	haxe_Log.trace("1A",{ fileName : "Controller.hx", lineNumber : 30, className : "Controller", methodName : "out1A"});
+	haxe_Log.trace("1A",{ fileName : "Controller.hx", lineNumber : 31, className : "Controller", methodName : "out1A"});
 	return tbc_TBC.skip();
 };
 Controller.out1B = function(ev) {
-	haxe_Log.trace("1B",{ fileName : "Controller.hx", lineNumber : 31, className : "Controller", methodName : "out1B"});
+	haxe_Log.trace("1B",{ fileName : "Controller.hx", lineNumber : 32, className : "Controller", methodName : "out1B"});
 	return tbc_TBC.skip();
 };
 Controller.out2 = function(ev) {
-	haxe_Log.trace("2",{ fileName : "Controller.hx", lineNumber : 32, className : "Controller", methodName : "out2"});
+	haxe_Log.trace("2",{ fileName : "Controller.hx", lineNumber : 33, className : "Controller", methodName : "out2"});
 	return tbc_TBC.skip();
+};
+Controller.tooLate = function(triv) {
+	haxe_Log.trace("too slow",{ fileName : "Controller.hx", lineNumber : 34, className : "Controller", methodName : "tooLate"});
+	return tbc_TBC.skip();
+};
+Controller.nagTheUser = function() {
+	haxe_Log.trace("Hurry up",{ fileName : "Controller.hx", lineNumber : 36, className : "Controller", methodName : "nagTheUser"});
+	return null;
+};
+Controller.thankTheUser = function() {
+	haxe_Log.trace("Thankyou",{ fileName : "Controller.hx", lineNumber : 38, className : "Controller", methodName : "thankTheUser"});
+	return null;
 };
 Controller.tryEx = function() {
 	return tbc_TBC.exec(Controller.f);
@@ -115,6 +127,11 @@ Controller.useCase = function() {
 				var this7 = tbc_TBCHTML.click(Controller.b1b);
 				$r = this7.guarding(Controller.out1B);
 				return $r;
+			}($this)),(function($this) {
+				var $r;
+				var this8 = tbc_TBCTime.timeout(2000);
+				$r = this8.guarding(Controller.tooLate);
+				return $r;
 			}($this)));
 			var p = this5.sc(q2);
 			this3 = p;
@@ -137,6 +154,19 @@ Controller.useCase = function() {
 		return $r;
 	}(this)));
 };
+Controller.nag = function(triv) {
+	return tbc_TBC.await(tbc__$TBC_Guard_$Impl_$.andThen(tbc_TBCHTML.click(Controller.b0),tbc_TBC.exec(Controller.thankTheUser)),tbc__$TBC_Guard_$Impl_$.andThen(tbc_TBCTime.timeout(1000),(function($this) {
+		var $r;
+		var this1 = tbc_TBC.exec(Controller.nagTheUser);
+		$r = (function($this) {
+			var $r;
+			var p = this1.bind(Controller.nag);
+			$r = p;
+			return $r;
+		}($this));
+		return $r;
+	}(this))));
+};
 Controller.onload = function() {
 	var win = window;
 	var doc = win.document;
@@ -144,14 +174,9 @@ Controller.onload = function() {
 	Controller.b1a = js_Boot.__cast(doc.getElementById("button:oneA") , HTMLButtonElement);
 	Controller.b1b = js_Boot.__cast(doc.getElementById("button:oneB") , HTMLButtonElement);
 	Controller.b2 = js_Boot.__cast(doc.getElementById("button:two") , HTMLButtonElement);
-	haxe_Log.trace("hello",{ fileName : "Controller.hx", lineNumber : 64, className : "Controller", methodName : "onload"});
-	var this1;
-	var this2 = Controller.tryPar();
-	var q = Controller.useCase();
-	var p = this2.sc(q);
-	this1 = p;
+	haxe_Log.trace("hello",{ fileName : "Controller.hx", lineNumber : 79, className : "Controller", methodName : "onload"});
+	var this1 = Controller.nag(null);
 	this1.go(function(x) {
-		return 42;
 	});
 };
 var List = function() {
@@ -185,14 +210,6 @@ var haxe_Timer = function(time_ms) {
 	},time_ms);
 };
 haxe_Timer.__name__ = true;
-haxe_Timer.delay = function(f,time_ms) {
-	var t = new haxe_Timer(time_ms);
-	t.run = function() {
-		t.stop();
-		f();
-	};
-	return t;
-};
 haxe_Timer.prototype = {
 	stop: function() {
 		if(this.id == null) return;
@@ -435,6 +452,11 @@ tbc_UnitP.prototype = $extend(tbc_ProcessA.prototype,{
 	}
 	,__class__: tbc_UnitP
 });
+var tbc_Disabler = function() { };
+tbc_Disabler.__name__ = true;
+tbc_Disabler.prototype = {
+	__class__: tbc_Disabler
+};
 var tbc_GuardI = function() { };
 tbc_GuardI.__name__ = true;
 tbc_GuardI.prototype = {
@@ -446,10 +468,7 @@ tbc__$TBC_Guard_$Impl_$._new = function(g) {
 	return g;
 };
 tbc__$TBC_Guard_$Impl_$.enable = function(this1,k) {
-	this1.enable(k);
-};
-tbc__$TBC_Guard_$Impl_$.disable = function(this1) {
-	this1.disable();
+	return this1.enable(k);
 };
 tbc__$TBC_Guard_$Impl_$.guarding = function(this1,k) {
 	return this1.guarding(k);
@@ -457,18 +476,13 @@ tbc__$TBC_Guard_$Impl_$.guarding = function(this1,k) {
 tbc__$TBC_Guard_$Impl_$.andThen = function(this1,p) {
 	return this1.andThen(p);
 };
-tbc__$TBC_Guard_$Impl_$.asGP = function(this1) {
-	return this1.asGP();
-};
 var tbc_GuardA = function() { };
 tbc_GuardA.__name__ = true;
 tbc_GuardA.__interfaces__ = [tbc_GuardI];
 tbc_GuardA.prototype = {
 	enable: function(k) {
 		throw new js__$Boot_HaxeError("Method enable not overridden in " + Std.string(this));
-	}
-	,disable: function() {
-		throw new js__$Boot_HaxeError("Method disable not overridden in " + Std.string(this));
+		return null;
 	}
 	,guarding: function(k) {
 		return new tbc__$TBC_GuardedProcessC(this,k);
@@ -477,9 +491,6 @@ tbc_GuardA.prototype = {
 		return this.guarding(function(ev) {
 			return p;
 		});
-	}
-	,asGP: function() {
-		return this.guarding(tbc_TBC.toss());
 	}
 	,__class__: tbc_GuardA
 };
@@ -497,14 +508,11 @@ tbc__$TBC_GuardedProcessC.__interfaces__ = [tbc_GuardedProcess];
 tbc__$TBC_GuardedProcessC.prototype = {
 	enable: function(first,k) {
 		var _g = this;
-		this._guard.enable(function(b) {
+		return this._guard.enable(function(b) {
 			first();
 			var this1 = _g._f(b);
 			this1.go(k);
 		});
-	}
-	,disable: function() {
-		this._guard.disable();
 	}
 	,__class__: tbc__$TBC_GuardedProcessC
 };
@@ -515,7 +523,15 @@ tbc_AwaitP.__name__ = true;
 tbc_AwaitP.__super__ = tbc_ProcessA;
 tbc_AwaitP.prototype = $extend(tbc_ProcessA.prototype,{
 	go: function(k) {
-		var _g = this;
+		var disablers = [];
+		var disable = function() {
+			var _g = 0;
+			while(_g < disablers.length) {
+				var d = disablers[_g];
+				++_g;
+				d.disable();
+			}
+		};
 		var _g_head = this.gps.h;
 		var _g_val = null;
 		while(_g_head != null) {
@@ -527,21 +543,8 @@ tbc_AwaitP.prototype = $extend(tbc_ProcessA.prototype,{
 				$r = _g_val;
 				return $r;
 			}(this));
-			gp.enable(function() {
-				var _g1_head = _g.gps.h;
-				var _g1_val = null;
-				while(_g1_head != null) {
-					var gp1;
-					gp1 = (function($this) {
-						var $r;
-						_g1_val = _g1_head[0];
-						_g1_head = _g1_head[1];
-						$r = _g1_val;
-						return $r;
-					}(this));
-					gp1.disable();
-				}
-			},k);
+			var d1 = gp.enable(disable,k);
+			disablers.push(d1);
 		}
 	}
 	,__class__: tbc_AwaitP
@@ -616,6 +619,18 @@ tbc_TBC.await = function(gp0,gp1,gp2,gp3,gp4,gp5) {
 	if(gp5 != null) list.add(gp5);
 	return new tbc_AwaitP(list);
 };
+var tbc__$TBCHTML_ButtonDisabler = function(el) {
+	this._el = el;
+};
+tbc__$TBCHTML_ButtonDisabler.__name__ = true;
+tbc__$TBCHTML_ButtonDisabler.__interfaces__ = [tbc_Disabler];
+tbc__$TBCHTML_ButtonDisabler.prototype = {
+	disable: function() {
+		this._el.onclick = null;
+		this._el.disabled = true;
+	}
+	,__class__: tbc__$TBCHTML_ButtonDisabler
+};
 var tbc_ClickG = function(el) {
 	this._el = el;
 };
@@ -625,10 +640,7 @@ tbc_ClickG.prototype = $extend(tbc_GuardA.prototype,{
 	enable: function(k) {
 		this._el.onclick = k;
 		this._el.disabled = false;
-	}
-	,disable: function() {
-		this._el.onclick = null;
-		this._el.disabled = true;
+		return new tbc__$TBCHTML_ButtonDisabler(this._el);
 	}
 	,__class__: tbc_ClickG
 });
@@ -637,26 +649,43 @@ tbc_TBCHTML.__name__ = true;
 tbc_TBCHTML.click = function(el) {
 	return new tbc_ClickG(el);
 };
-var tbc__$TBCTime_PauseP = function(delay) {
-	this._delay = delay;
+var tbc__$TBCTime_MyTimer = function(timeInMiliSecs,k) {
+	var _g = this;
+	this.timer = new haxe_Timer(timeInMiliSecs);
+	this.timer.run = function() {
+		_g.timer.stop();
+		k(null);
+	};
 };
-tbc__$TBCTime_PauseP.__name__ = true;
-tbc__$TBCTime_PauseP.__super__ = tbc_ProcessA;
-tbc__$TBCTime_PauseP.prototype = $extend(tbc_ProcessA.prototype,{
-	go: function(f) {
-		haxe_Timer.delay(function() {
-			f(null);
-		},this._delay);
+tbc__$TBCTime_MyTimer.__name__ = true;
+tbc__$TBCTime_MyTimer.__interfaces__ = [tbc_Disabler];
+tbc__$TBCTime_MyTimer.prototype = {
+	disable: function() {
+		this.timer.stop();
 	}
-	,__class__: tbc__$TBCTime_PauseP
+	,__class__: tbc__$TBCTime_MyTimer
+};
+var tbc_TimeOutGuard = function(timeInMiliSecs) {
+	this._timeInMiliSecs = timeInMiliSecs;
+};
+tbc_TimeOutGuard.__name__ = true;
+tbc_TimeOutGuard.__super__ = tbc_GuardA;
+tbc_TimeOutGuard.prototype = $extend(tbc_GuardA.prototype,{
+	enable: function(k) {
+		return new tbc__$TBCTime_MyTimer(this._timeInMiliSecs,k);
+	}
+	,__class__: tbc_TimeOutGuard
 });
 var tbc_TBCTime = function() { };
 tbc_TBCTime.__name__ = true;
 tbc_TBCTime.pause = function(delayInMiliSecs) {
-	return new tbc__$TBCTime_PauseP(delayInMiliSecs);
+	return tbc_TBC.await(tbc__$TBC_Guard_$Impl_$.andThen(tbc_TBCTime.timeout(delayInMiliSecs),tbc_TBC.skip()));
 };
 tbc_TBCTime.later = function() {
-	return new tbc__$TBCTime_PauseP(0);
+	return tbc_TBCTime.pause(0);
+};
+tbc_TBCTime.timeout = function(delayInMiliSecs) {
+	return new tbc_TimeOutGuard(delayInMiliSecs);
 };
 String.prototype.__class__ = String;
 String.__name__ = true;

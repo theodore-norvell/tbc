@@ -1,32 +1,48 @@
 package tbc;
 import tbc.TBC ;
+import tbc.TBC.* ;
 
 import haxe.Timer ;
 
-private class PauseP extends TBC.ProcessA<Triv> {
-    var _delay : Int ;
+private class MyTimer implements Disabler {
+    var timer : Timer ;
 
-    public function new( delay : Int ) {
-       _delay = delay ; }
+    public function new( timeInMiliSecs, k : Triv -> Void ) {
+        timer = new Timer( timeInMiliSecs ) ;
+        timer.run = function () {
+                        timer.stop() ; k(null) ;
+                    } ;
+    }
 
-    public override function go( f : Triv -> Void ) { 
-        // The next line creates a timer object and
-        // throws it away. The timer will run once after
-        // the specified delay.
-        // If the next line causes an error
-        //    Class<haxe.Timer> has no field delay
-        // then your target does not support timers.
-        // Be careful of targets where the Timer is not
-        // guaranteed to be on the same thread.
-        Timer.delay( function() { f( null ) ; }, _delay ) ; }
+    public function disable() : Void {
+       timer.stop() ;
+    }
+}
 
+class TimeOutGuard extends GuardA<Triv> {
+    var _timeInMiliSecs : Int ;
+
+    public function new( timeInMiliSecs : Int ) {
+        _timeInMiliSecs = timeInMiliSecs ;
+    }
+
+    public override function enable( k : Triv -> Void ) : Disabler  {
+        return new MyTimer( _timeInMiliSecs,  k ) ;
+    }
 }
 
 class TBCTime {
     static public function pause( delayInMiliSecs : Int ) 
         : Process<Triv> {
-        return new PauseP( delayInMiliSecs ) ; }
+        return await( timeout( delayInMiliSecs ) && skip() ) ; }
+
     static public function later( ) 
         : Process<Triv> {
-        return new PauseP( 0 ) ; }
+        return pause(0) ; }
+
+    static public function timeout( delayInMiliSecs : Int )
+        : Guard<Triv> {
+        return new TimeOutGuard( delayInMiliSecs ) ;
+    }
 }
+

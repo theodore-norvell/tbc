@@ -63,12 +63,14 @@ class UnitP<A> extends ProcessA<A> {
         k(_f()); }
 }
 
+interface Disabler {
+    public function disable() : Void ;
+}
+
 interface GuardI<E> {
-    public function enable( k : E -> Void ) : Void  ;
-    public function disable() : Void ; 
+    public function enable( k : E -> Void ) : Disabler  ;
     public function guarding<A>( k : E -> Process<A> ) : GuardedProcess<A> ;
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> ;
-    public function asGP( ) : GuardedProcess<Triv> ;
 }
 
 abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
@@ -77,11 +79,8 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
         this = g;
     }
 
-    public inline function enable( k : E -> Void ) : Void {
-        (this:GuardI<E>).enable( k ) ; }
-
-    public inline function disable() : Void {
-        (this:GuardI<E>).disable() ; }
+    public inline function enable( k : E -> Void ) : Disabler {
+        return (this:GuardI<E>).enable( k ) ; }
 
     @:op( A >> B )
     public inline function guarding<A>( k : E -> Process<A> )
@@ -93,33 +92,22 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> {
         return (this:GuardI<E>).andThen( p ) ;
     }
-
-    public function asGP( ) : GuardedProcess<Triv> {
-        return (this:GuardI<E>).asGP( ) ; } 
 }
 
 class GuardA<E> implements GuardI<E> {
-    public function enable( k : E -> Void ) { 
-        throw "Method enable not overridden in " + this ; }
-
-    public function disable() {
-        throw "Method disable not overridden in " + this ; }
+    public function enable( k : E -> Void ) : Disabler {
+        throw "Method enable not overridden in " + this ; return null ; }
 
     public function guarding<A>( k : E -> Process<A> ) : GuardedProcess<A> {
         return new GuardedProcessC<A,E>( this, k ) ; }
 
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> {
         return this.guarding( function( ev : E ) { return p ; } ) ; }
-
-    public function asGP<A>( ) : GuardedProcess<Triv> {
-        return this.guarding( TBC.toss() ) ; }
 }
 
 interface GuardedProcess<A> {
 
-    public function enable( first : Void -> Void, k : A -> Void ) : Void;
-        
-    public function disable() : Void ;
+    public function enable( first : Void -> Void, k : A -> Void ) : Disabler ;
 }
 
 private class  GuardedProcessC<A,E> implements GuardedProcess<A> {
@@ -128,15 +116,12 @@ private class  GuardedProcessC<A,E> implements GuardedProcess<A> {
     public function new( guard: Guard<E>, f : E -> Process<A> ) {
         _guard = guard ; _f = f ; }
 
-    public function enable( first : Void -> Void, k : A -> Void ) {
-        _guard.enable(
+    public function enable( first : Void -> Void, k : A -> Void ) : Disabler {
+        return _guard.enable(
             function( b : E) {
                 first() ; 
                 _f(b).go( k ) ; } ) ; }
-        
-    public function disable() {
-        _guard.disable() ; }
-} 
+}
 
 class AwaitP<A> extends ProcessA<A> {
     var gps : List<GuardedProcess<A>> ;
@@ -145,10 +130,14 @@ class AwaitP<A> extends ProcessA<A> {
        gps = a ; }
 
     public override function go( k : A -> Void ) {
-        for( gp in gps )
-            gp.enable( 
-                function( ) { for( gp in gps ) gp.disable() ; },
-                k) ; }
+        var disablers : Array<Disabler> = [] ;
+        function disable() {
+            for( d in disablers ) d.disable() ;
+        }
+        for( gp in gps ) {
+            var d = gp.enable( disable,  k) ;
+            disablers.push( d ) ; }
+    }
 }
 
 class Par2P<A,B> extends ProcessA<Pair<A,B>> {
