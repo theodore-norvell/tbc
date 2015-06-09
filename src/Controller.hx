@@ -10,7 +10,7 @@ import tbc.TBCHTML.*;
 
 import js.Browser ;
 import js.html.Event ;
-import js.html.ButtonElement ;
+import js.html.Element ;
 
 class Controller {
     static public function main() { 
@@ -19,10 +19,10 @@ class Controller {
         var body = doc.body ;
         body.onload = Controller.onload ; 
     }
-    static var b0 : ButtonElement ;
-    static var b1a : ButtonElement ;
-    static var b1b : ButtonElement ;
-    static var b2 : ButtonElement ;
+    static var b0 : Element ;
+    static var b1a : Element ;
+    static var b1b : Element ;
+    static var b2 : Element ;
 
     static function f( ) : Void { Log.trace( "X" ) ; }
     static function outX( ) { Log.trace( "XX" ) ; return null ; }
@@ -72,11 +72,12 @@ class Controller {
     static public function onload() {
         var win = Browser.window ;
         var doc = win.document ;
-        b0 = cast(doc.getElementById( "button:zero" ), ButtonElement) ;
-        b1a = cast(doc.getElementById( "button:oneA" ), ButtonElement)  ;
-        b1b = cast(doc.getElementById( "button:oneB" ), ButtonElement)  ;
-        b2 = cast(doc.getElementById( "button:two" ), ButtonElement)  ;
+        b0 = doc.getElementById( "button:zero" ) ;
+        //b0 = doc.getElementById( "body" ) ;
+        b1a = doc.getElementById( "button:oneA" ) ;
+        b1b = doc.getElementById( "button:oneB" ) ;
+        b2 = doc.getElementById( "button:two" ) ;
         Log.trace("hello");
-        (nag(null)).go( function(x:Triv) : Void { }  ) ;
+        (nag(null) > useCase()).go( function(x:Triv) : Void { }  ) ;
     }
 }

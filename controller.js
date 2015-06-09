@@ -170,12 +170,16 @@ Controller.nag = function(triv) {
 Controller.onload = function() {
 	var win = window;
 	var doc = win.document;
-	Controller.b0 = js_Boot.__cast(doc.getElementById("button:zero") , HTMLButtonElement);
-	Controller.b1a = js_Boot.__cast(doc.getElementById("button:oneA") , HTMLButtonElement);
-	Controller.b1b = js_Boot.__cast(doc.getElementById("button:oneB") , HTMLButtonElement);
-	Controller.b2 = js_Boot.__cast(doc.getElementById("button:two") , HTMLButtonElement);
-	haxe_Log.trace("hello",{ fileName : "Controller.hx", lineNumber : 79, className : "Controller", methodName : "onload"});
-	var this1 = Controller.nag(null);
+	Controller.b0 = doc.getElementById("button:zero");
+	Controller.b1a = doc.getElementById("button:oneA");
+	Controller.b1b = doc.getElementById("button:oneB");
+	Controller.b2 = doc.getElementById("button:two");
+	haxe_Log.trace("hello",{ fileName : "Controller.hx", lineNumber : 80, className : "Controller", methodName : "onload"});
+	var this1;
+	var this2 = Controller.nag(null);
+	var q = Controller.useCase();
+	var p = this2.sc(q);
+	this1 = p;
 	this1.go(function(x) {
 	});
 };
@@ -190,7 +194,6 @@ List.prototype = {
 		this.q = x;
 		this.length++;
 	}
-	,__class__: List
 };
 Math.__name__ = true;
 var Std = function() { };
@@ -218,7 +221,6 @@ haxe_Timer.prototype = {
 	}
 	,run: function() {
 	}
-	,__class__: haxe_Timer
 };
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
@@ -229,7 +231,6 @@ var js__$Boot_HaxeError = function(val) {
 js__$Boot_HaxeError.__name__ = true;
 js__$Boot_HaxeError.__super__ = Error;
 js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
-	__class__: js__$Boot_HaxeError
 });
 var js_Boot = function() { };
 js_Boot.__name__ = true;
@@ -251,15 +252,6 @@ js_Boot.__trace = function(v,i) {
 	}
 	var d;
 	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js_Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
-};
-js_Boot.getClass = function(o) {
-	if((o instanceof Array) && o.__enum__ == null) return Array; else {
-		var cl = o.__class__;
-		if(cl != null) return cl;
-		var name = js_Boot.__nativeClassName(o);
-		if(name != null) return js_Boot.__resolveNativeClass(name);
-		return null;
-	}
 };
 js_Boot.__string_rec = function(o,s) {
 	if(o == null) return "null";
@@ -329,69 +321,8 @@ js_Boot.__string_rec = function(o,s) {
 		return String(o);
 	}
 };
-js_Boot.__interfLoop = function(cc,cl) {
-	if(cc == null) return false;
-	if(cc == cl) return true;
-	var intf = cc.__interfaces__;
-	if(intf != null) {
-		var _g1 = 0;
-		var _g = intf.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var i1 = intf[i];
-			if(i1 == cl || js_Boot.__interfLoop(i1,cl)) return true;
-		}
-	}
-	return js_Boot.__interfLoop(cc.__super__,cl);
-};
-js_Boot.__instanceof = function(o,cl) {
-	if(cl == null) return false;
-	switch(cl) {
-	case Int:
-		return (o|0) === o;
-	case Float:
-		return typeof(o) == "number";
-	case Bool:
-		return typeof(o) == "boolean";
-	case String:
-		return typeof(o) == "string";
-	case Array:
-		return (o instanceof Array) && o.__enum__ == null;
-	case Dynamic:
-		return true;
-	default:
-		if(o != null) {
-			if(typeof(cl) == "function") {
-				if(o instanceof cl) return true;
-				if(js_Boot.__interfLoop(js_Boot.getClass(o),cl)) return true;
-			} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
-				if(o instanceof cl) return true;
-			}
-		} else return false;
-		if(cl == Class && o.__name__ != null) return true;
-		if(cl == Enum && o.__ename__ != null) return true;
-		return o.__enum__ == cl;
-	}
-};
-js_Boot.__cast = function(o,t) {
-	if(js_Boot.__instanceof(o,t)) return o; else throw new js__$Boot_HaxeError("Cannot cast " + Std.string(o) + " to " + Std.string(t));
-};
-js_Boot.__nativeClassName = function(o) {
-	var name = js_Boot.__toStr.call(o).slice(8,-1);
-	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") return null;
-	return name;
-};
-js_Boot.__isNativeObj = function(o) {
-	return js_Boot.__nativeClassName(o) != null;
-};
-js_Boot.__resolveNativeClass = function(name) {
-	return (Function("return typeof " + name + " != \"undefined\" ? " + name + " : null"))();
-};
 var tbc_ProcessI = function() { };
 tbc_ProcessI.__name__ = true;
-tbc_ProcessI.prototype = {
-	__class__: tbc_ProcessI
-};
 var tbc__$TBC_Process_$Impl_$ = {};
 tbc__$TBC_Process_$Impl_$.__name__ = true;
 tbc__$TBC_Process_$Impl_$._new = function(p) {
@@ -423,7 +354,6 @@ tbc_ProcessA.prototype = {
 	,go: function(k) {
 		throw new js__$Boot_HaxeError("go is not defined in " + Std.string(this));
 	}
-	,__class__: tbc_ProcessA
 };
 var tbc__$TBC_ThenP = function(left,right) {
 	this._left = left;
@@ -439,29 +369,21 @@ tbc__$TBC_ThenP.prototype = $extend(tbc_ProcessA.prototype,{
 			this1.go(f);
 		});
 	}
-	,__class__: tbc__$TBC_ThenP
 });
-var tbc_UnitP = function(f) {
+var tbc__$TBC_ExecP = function(f) {
 	this._f = f;
 };
-tbc_UnitP.__name__ = true;
-tbc_UnitP.__super__ = tbc_ProcessA;
-tbc_UnitP.prototype = $extend(tbc_ProcessA.prototype,{
+tbc__$TBC_ExecP.__name__ = true;
+tbc__$TBC_ExecP.__super__ = tbc_ProcessA;
+tbc__$TBC_ExecP.prototype = $extend(tbc_ProcessA.prototype,{
 	go: function(k) {
 		k(this._f());
 	}
-	,__class__: tbc_UnitP
 });
 var tbc_Disabler = function() { };
 tbc_Disabler.__name__ = true;
-tbc_Disabler.prototype = {
-	__class__: tbc_Disabler
-};
 var tbc_GuardI = function() { };
 tbc_GuardI.__name__ = true;
-tbc_GuardI.prototype = {
-	__class__: tbc_GuardI
-};
 var tbc__$TBC_Guard_$Impl_$ = {};
 tbc__$TBC_Guard_$Impl_$.__name__ = true;
 tbc__$TBC_Guard_$Impl_$._new = function(g) {
@@ -492,20 +414,48 @@ tbc_GuardA.prototype = {
 			return p;
 		});
 	}
-	,__class__: tbc_GuardA
 };
-var tbc_GuardedProcess = function() { };
-tbc_GuardedProcess.__name__ = true;
-tbc_GuardedProcess.prototype = {
-	__class__: tbc_GuardedProcess
+var tbc_GuardedProcessI = function() { };
+tbc_GuardedProcessI.__name__ = true;
+var tbc__$TBC_GuardedProcess_$Impl_$ = {};
+tbc__$TBC_GuardedProcess_$Impl_$.__name__ = true;
+tbc__$TBC_GuardedProcess_$Impl_$._new = function(gp) {
+	return gp;
+};
+tbc__$TBC_GuardedProcess_$Impl_$.bind = function(this1,f) {
+	var gp = this1.bind(f);
+	return gp;
+};
+tbc__$TBC_GuardedProcess_$Impl_$.sc = function(this1,q) {
+	var gp = this1.sc(q);
+	return gp;
+};
+tbc__$TBC_GuardedProcess_$Impl_$.enable = function(this1,first,k) {
+	return this1.enable(first,k);
+};
+var tbc_GuardedProcessA = function() { };
+tbc_GuardedProcessA.__name__ = true;
+tbc_GuardedProcessA.__interfaces__ = [tbc_GuardedProcessI];
+tbc_GuardedProcessA.prototype = {
+	bind: function(f) {
+		return new tbc__$TBC_ThenGP(this,f);
+	}
+	,sc: function(b) {
+		return new tbc__$TBC_ThenGP(this,function(a) {
+			return b;
+		});
+	}
+	,enable: function(first,k) {
+		throw new js__$Boot_HaxeError("enable is not defined in " + Std.string(this));
+	}
 };
 var tbc__$TBC_GuardedProcessC = function(guard,f) {
 	this._guard = guard;
 	this._f = f;
 };
 tbc__$TBC_GuardedProcessC.__name__ = true;
-tbc__$TBC_GuardedProcessC.__interfaces__ = [tbc_GuardedProcess];
-tbc__$TBC_GuardedProcessC.prototype = {
+tbc__$TBC_GuardedProcessC.__super__ = tbc_GuardedProcessA;
+tbc__$TBC_GuardedProcessC.prototype = $extend(tbc_GuardedProcessA.prototype,{
 	enable: function(first,k) {
 		var _g = this;
 		return this._guard.enable(function(b) {
@@ -514,8 +464,22 @@ tbc__$TBC_GuardedProcessC.prototype = {
 			this1.go(k);
 		});
 	}
-	,__class__: tbc__$TBC_GuardedProcessC
+});
+var tbc__$TBC_ThenGP = function(gp,f) {
+	this._gp = gp;
+	this._f = f;
 };
+tbc__$TBC_ThenGP.__name__ = true;
+tbc__$TBC_ThenGP.__super__ = tbc_GuardedProcessA;
+tbc__$TBC_ThenGP.prototype = $extend(tbc_GuardedProcessA.prototype,{
+	enable: function(first,k) {
+		var _g = this;
+		return this._gp.enable(first,function(a) {
+			var this1 = _g._f(a);
+			this1.go(k);
+		});
+	}
+});
 var tbc_AwaitP = function(a) {
 	this.gps = a;
 };
@@ -547,7 +511,6 @@ tbc_AwaitP.prototype = $extend(tbc_ProcessA.prototype,{
 			disablers.push(d1);
 		}
 	}
-	,__class__: tbc_AwaitP
 });
 var tbc_Par2P = function(p,q) {
 	this._p = p;
@@ -570,32 +533,24 @@ tbc_Par2P.prototype = $extend(tbc_ProcessA.prototype,{
 			if(completed == 2) k(result);
 		});
 	}
-	,__class__: tbc_Par2P
 });
 var tbc_Triv = { __ename__ : true, __constructs__ : [] };
 var tbc_Pair = function() {
 };
 tbc_Pair.__name__ = true;
-tbc_Pair.prototype = {
-	__class__: tbc_Pair
+var tbc_TBC = function() {
 };
-var tbc_TBC = function() { };
 tbc_TBC.__name__ = true;
-tbc_TBC.toss = function() {
-	return function(x) {
-		return tbc_TBC.unit(null);
-	};
-};
 tbc_TBC.skip = function() {
 	return tbc_TBC.unit(null);
 };
 tbc_TBC.unit = function(a) {
-	return new tbc_UnitP(function() {
+	return new tbc__$TBC_ExecP(function() {
 		return a;
 	});
 };
 tbc_TBC.exec = function(f) {
-	return new tbc_UnitP(f);
+	return new tbc__$TBC_ExecP(f);
 };
 tbc_TBC.par = function(p,q) {
 	return new tbc_Par2P(p,q);
@@ -619,17 +574,20 @@ tbc_TBC.await = function(gp0,gp1,gp2,gp3,gp4,gp5) {
 	if(gp5 != null) list.add(gp5);
 	return new tbc_AwaitP(list);
 };
-var tbc__$TBCHTML_ButtonDisabler = function(el) {
+var tbc__$TBCHTML_ElementDisabler = function(el) {
 	this._el = el;
 };
-tbc__$TBCHTML_ButtonDisabler.__name__ = true;
-tbc__$TBCHTML_ButtonDisabler.__interfaces__ = [tbc_Disabler];
-tbc__$TBCHTML_ButtonDisabler.prototype = {
+tbc__$TBCHTML_ElementDisabler.__name__ = true;
+tbc__$TBCHTML_ElementDisabler.__interfaces__ = [tbc_Disabler];
+tbc__$TBCHTML_ElementDisabler.prototype = {
 	disable: function() {
 		this._el.onclick = null;
-		this._el.disabled = true;
+		this.disableElement();
 	}
-	,__class__: tbc__$TBCHTML_ButtonDisabler
+	,disableElement: function() {
+		var el = this._el;
+		if(el.disabled != null) el.disabled = true;
+	}
 };
 var tbc_ClickG = function(el) {
 	this._el = el;
@@ -639,10 +597,13 @@ tbc_ClickG.__super__ = tbc_GuardA;
 tbc_ClickG.prototype = $extend(tbc_GuardA.prototype,{
 	enable: function(k) {
 		this._el.onclick = k;
-		this._el.disabled = false;
-		return new tbc__$TBCHTML_ButtonDisabler(this._el);
+		this.enableElement();
+		return new tbc__$TBCHTML_ElementDisabler(this._el);
 	}
-	,__class__: tbc_ClickG
+	,enableElement: function() {
+		var el = this._el;
+		if(el.disabled != null) el.disabled = false;
+	}
 });
 var tbc_TBCHTML = function() { };
 tbc_TBCHTML.__name__ = true;
@@ -663,7 +624,6 @@ tbc__$TBCTime_MyTimer.prototype = {
 	disable: function() {
 		this.timer.stop();
 	}
-	,__class__: tbc__$TBCTime_MyTimer
 };
 var tbc_TimeOutGuard = function(timeInMiliSecs) {
 	this._timeInMiliSecs = timeInMiliSecs;
@@ -674,7 +634,6 @@ tbc_TimeOutGuard.prototype = $extend(tbc_GuardA.prototype,{
 	enable: function(k) {
 		return new tbc__$TBCTime_MyTimer(this._timeInMiliSecs,k);
 	}
-	,__class__: tbc_TimeOutGuard
 });
 var tbc_TBCTime = function() { };
 tbc_TBCTime.__name__ = true;
@@ -687,17 +646,7 @@ tbc_TBCTime.later = function() {
 tbc_TBCTime.timeout = function(delayInMiliSecs) {
 	return new tbc_TimeOutGuard(delayInMiliSecs);
 };
-String.prototype.__class__ = String;
 String.__name__ = true;
 Array.__name__ = true;
-var Int = { __name__ : ["Int"]};
-var Dynamic = { __name__ : ["Dynamic"]};
-var Float = Number;
-Float.__name__ = ["Float"];
-var Bool = Boolean;
-Bool.__ename__ = ["Bool"];
-var Class = { __name__ : ["Class"]};
-var Enum = { };
-js_Boot.__toStr = {}.toString;
 Controller.main();
 })(typeof console != "undefined" ? console : {log:function(){}});
