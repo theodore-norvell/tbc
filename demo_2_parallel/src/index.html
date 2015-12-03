@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>TBC Demo 2</title>
+    </head>
+    <body id="body">
+    <p>Demo 2. This is based on my
+        <a href="http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html">
+            blog entry</a>.  This one demonstrates parallelism and pauses.</p>
+       <script type="text/javascript" src="release/controller.js"></script>
+
+       <p>The TBC code is as follows.</p>
+       <pre>
+       loop(
+            par(
+                exec(out("x0")) > pause(1000) > exec(out("x1"))
+                ,
+                exec(out("y0")) > pause(1000) > exec(out("y1"))
+            ) >
+            pause(1000)
+        )
+       </pre>
+       <div id="haxe:trace"></div>
+    </body>
+</html>
