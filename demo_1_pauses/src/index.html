@@ -1,10 +1,28 @@
 <html>
     <head>
-        <title>Hello</title>
+        <title>TBC Demo 1</title>
     </head>
     <body id="body">
+    <p>Demo 1. This is based on my
+        <a href="http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html">
+            blog entry</a>.  This one demonstrates timeouts and pauses.</p>
        <script type="text/javascript" src="release/controller.js"></script>
-       <p>Updated on Dec 2</p>
+
+       <p>The TBC code is as follows.</p>
+       <pre>
+       loop(
+            nag( null ) >
+            await(
+                click( b1a ) >> out1A
+            ,
+                click( b1b ) >> out1B
+            ,
+                timeout( 2000 ) >> tooLate
+            ) >
+            pause(1000) >
+            await( click( b2 ) >> out2 )
+        )
+       </pre>
        <button id="button:zero" disabled=true >Zero</button> 
        <button id="button:oneA" disabled=true >One A</button> 
        <button id="button:oneB" disabled=true >One B</button> 

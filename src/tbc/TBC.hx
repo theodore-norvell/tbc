@@ -108,10 +108,12 @@ interface GuardI<E> {
     public function guarding<A>( k : E -> Process<A> ) : GuardedProcess<A> ;
     /** Create a guarded process. **/
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> ;
+    /** Create a guard that is conditional on some condition. */
+    public function and( c : E -> Bool ) : GuardI<E> ;
 }
 
 /** An abstract type that enhances GuardI<E> by adding
-* operator overloads >> and && .
+* operator overloads >> and && and & .
 *
 **/
 abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
@@ -136,6 +138,12 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> {
         return (this:GuardI<E>).andThen( p ) ;
     }
+
+    /** See GuardI.and **/
+    @:op( A & B )
+    public function and( c : E -> Bool ) : Guard<E> {
+        return (this:GuardI<E>).and( c ) ;
+    }
 }
 
 
@@ -152,6 +160,24 @@ class GuardA<E> implements GuardI<E> {
 
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> {
         return this.guarding( function( ev : E ) { return p ; } ) ; }
+
+    public function and( c : E -> Bool ) : GuardI<E> {
+        return new ConditionedGuardC<E>( this, c ) ; }
+}
+
+class ConditionedGuardC<E> extends GuardA<E> {
+    var _guard : Guard<E> ;
+    var _c : E -> Bool ;
+    public function new( guard: Guard<E>, c : E -> Bool ) {
+        _guard = guard ; _c = c ; }
+
+    override public function enable( k : E -> Void ) : Disabler {
+        return _guard.enable(
+            // The event handler passed to the guard does nothing
+            // if _c(b) is false.
+            function( b : E) {
+                if( _c(b) ) { k(b) ; } else {}
+            }) ; }
 }
 
 
@@ -228,7 +254,7 @@ class GuardedProcessA<A> implements GuardedProcessI<A>{
         throw "enable is not defined in "+this ; }
 }
 
-/** A guarded process made from a Gaurd<E> and a function E->Process<A>
+/** A guarded process made from a Guard<E> and a function E->Process<A>
 *
 **/
 private class  GuardedProcessC<A,E> extends GuardedProcessA<A> {

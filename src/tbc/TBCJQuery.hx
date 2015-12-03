@@ -1,8 +1,10 @@
 package tbc;
-/** This module requires Andy Li's JQuery extern library */
+
 import tbc.TBC.Guard ;
 import tbc.TBC.GuardA ;
 import tbc.TBC.Disabler ;
+
+/** This module requires Andy Li's JQuery extern library */
 import jQuery.JQuery ;
 import jQuery.Event ;
 
