@@ -11,17 +11,26 @@
        <p>The TBC code is as follows.</p>
        <pre>
        loop(
-            nag( null ) >
+            nag( null ) &gt;
             await(
-                click( b1a ) >> out1A
+                click( b1a ) &gt;&gt; out1A
             ,
-                click( b1b ) >> out1B
+                click( b1b ) &gt;&gt; out1B
             ,
-                timeout( 2000 ) >> tooLate
-            ) >
-            pause(1000) >
-            await( click( b2 ) >> out2 )
+                timeout( 2000 ) &gt;&gt; tooLate
+            ) &gt;
+            pause(1000) &gt;
+            await( click( b2 ) &gt;&gt; out2 )
         )
+       </pre>
+       <p>where the nag function is defined by</p>
+       <pre>
+       static function nag(triv : Triv) : Process&lt;Triv&gt;{ return
+           await(
+               click(b0) &amp;&amp; exec(thankTheUser)
+           ,
+               timeout( 1000 ) &amp;&amp; exec(nagTheUser) &gt;= nag
+           ) ; }
        </pre>
        <button id="button:zero" disabled=true >Zero</button> 
        <button id="button:oneA" disabled=true >One A</button> 

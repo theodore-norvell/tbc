@@ -9,13 +9,13 @@
        <p>The TBC code is as follows.</p>
        <pre>
        loop(
-            await( click( b0 ) >> out0  ) >
+            await( click( b0 ) &gt;&gt; out0  ) &gt;
             await(
-                click( b1a ) >> out1A
+                click( b1a ) &gt;&gt; out1A
             ,
-                click( b1b ) >> out1B
-            ) >
-            await( click( b2 ) >> out2 )
+                click( b1b ) &gt;&gt; out1B
+            ) &gt;
+            await( click( b2 ) &gt;&gt; out2 )
         )
        </pre>
        <script type="text/javascript" src="release/controller.js"></script>
