@@ -39,9 +39,9 @@ class Controller {
             nag( null ) >
             await(
                 click( b1a ) >> out1A
-            ,
+            ||
                 click( b1b ) >> out1B
-            ,
+            ||
                 timeout( 2000 ) >> tooLate
             ) >
             pause(1000) >
@@ -51,7 +51,7 @@ class Controller {
     static function nag(triv : Triv) : Process<Triv>{ return
         await(
             click(b0) && exec(thankTheUser)
-        ,
+        ||
             timeout( 1000 ) && exec(nagTheUser) >= nag
         ) ; }
 

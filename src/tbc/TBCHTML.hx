@@ -6,6 +6,7 @@ import tbc.TBC.Guard ;
 import tbc.TBC.GuardA ;
 import tbc.TBC.Disabler ;
 import js.html.* ;
+import haxe.Log ;
 
 private class ElementDisabler implements Disabler {
     var _el : Element  ;
@@ -79,18 +80,16 @@ class SubmitG extends HTMLEventGuardA {
     }
 }
 
-
-
-class EnterG extends HTMLEventGuardA {
+class KeyPressG extends HTMLEventGuardA {
 
     public function new( el : Element ) {
         super(el) ;
     }
     override function addHandler( k : Event -> Void ) {
-        _el.onkeyup = k ;
+        _el.onkeypress = k ;
     }
     override function removeHandler( k : Event -> Void ) {
-        _el.onkeyup  = null ;
+        _el.onkeypress  = null ;
     }
 }
 
@@ -102,6 +101,6 @@ class TBCHTML {
     public static function submit( el : Element ) : Guard<Event>{
         return new SubmitG( el ) ; }
 
-    public static function enter( el : Element ) : Guard<Event>{
-        return new EnterG( el ) ; }
+    public static function keypress( el : Element ) : Guard<Event>{
+        return new KeyPressG( el ) ; }
 }

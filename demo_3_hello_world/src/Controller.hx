@@ -1,4 +1,5 @@
 package ;
+import js.html.KeyboardEvent;
 import haxe.Log ;
 import tbc.TBC.Process ;
 import tbc.TBC.Guard ;
@@ -37,15 +38,14 @@ class Controller {
                 el.style.visibility = "hidden";  return null ; } ) ;
     }
 
-    static function getText( el : InputElement ) : Process<String> { return
+    static function getValue( el : InputElement ) : Process<String> { return
         exec( function()  : String {
             return el.value ; } ) ;
     }
 
     static function clearText( el : InputElement ) : Process<Triv> { return
         exec( function()  : Triv {
-            el.value = "" ;
-            return null ; } ) ;
+            el.value = "" ; return null ; } ) ;
     }
 
     static function putText( el : Element, str : String  ) : Process<Triv> { return
@@ -64,11 +64,11 @@ class Controller {
         Log.trace("Started at " + Date.now() );
         var p =
             loop  (
-                putText( reply, "M" ) >
+                putText( reply, "" ) >
                 clearText( nameBox ) >
                 show( nameBox )  >
                 show( question ) >
-                getAndDisplayAnswer(null) > // Implement later.
+                getAndDisplayAnswer(null) >
                 hide( question ) >
                 hide( nameBox ) >
                 pause( 1000 )
@@ -79,8 +79,15 @@ class Controller {
     static function getAndDisplayAnswer( x : Triv ) : Process<Triv>{
         return
             // Simple non nagging version
-            await( enter( nameBox ) && getText( nameBox ) ) >=
-            function( name : String ) { return
+            await( enter( nameBox ) && getValue( nameBox ) ) >=
+            function( name : String ) : Process<Triv>{ return
                 putText( reply, "Hello "+name ) ; } ;
+    }
+
+    static function enter( el : Element ) : Guard<Event> {
+        function isEnterKey( ev : Event ) : Bool {
+            var kev = cast(ev, KeyboardEvent) ;
+            return kev.keyCode == 13 || kev.which == 13 ; }
+        return keypress( nameBox ) & isEnterKey ;
     }
 }

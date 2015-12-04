@@ -14,9 +14,9 @@
             nag( null ) &gt;
             await(
                 click( b1a ) &gt;&gt; out1A
-            ,
+            ||
                 click( b1b ) &gt;&gt; out1B
-            ,
+            ||
                 timeout( 2000 ) &gt;&gt; tooLate
             ) &gt;
             pause(1000) &gt;
@@ -28,10 +28,13 @@
        static function nag(triv : Triv) : Process&lt;Triv&gt;{ return
            await(
                click(b0) &amp;&amp; exec(thankTheUser)
-           ,
+           ||
                timeout( 1000 ) &amp;&amp; exec(nagTheUser) &gt;= nag
            ) ; }
        </pre>
+       <p>A subtle change from <a href="../demo_0_blog">Demo 0</a> is the use of <kbd>||</kbd>
+          to create a choice between two guarded commands.
+       </p>
        <button id="button:zero" disabled=true >Zero</button> 
        <button id="button:oneA" disabled=true >One A</button> 
        <button id="button:oneB" disabled=true >One B</button> 

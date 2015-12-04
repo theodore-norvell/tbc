@@ -2,23 +2,50 @@
     <head>
         <title>TBC Demo 3</title>
     </head>
-    <body id="body">
+    <p id="body">
         <script type="text/javascript" src="release/controller.js"></script>
         <p>Demo 2. This is a hello world application based on my
-        <a href="http://www.engr.mun.ca/~theo/Publications/TBC-NECEC-2015-slides.pdf">
-            NECEC 2015 talk</a>.
+            <a href="http://www.engr.mun.ca/~theo/Publications/TBC-NECEC-2015-slides.pdf">
+                NECEC 2015 talk</a>.
 
-        The TBC code is shown at the bottom. </p>
+            The TBC code is shown at the bottom. </p>
 
         <label id="question" for="name">What is your name?</label>
-        <input  id="nameBox" type="text" name="name" id="name">
-        <br>
+        <input  id="nameBox" type="text" name="name">
         <label id="reply" for="name"></label>
 
        <p>The TBC code is as follows.</p>
        <pre>
-       TBD
+           loop  (
+                putText( reply, "" ) &gt;
+                clearText( nameBox ) &gt;
+                show( nameBox )  &gt;
+                show( question ) &gt;
+                getAndDisplayAnswer(null) &gt;
+                hide( question ) &gt;
+                hide( nameBox ) &gt;
+                pause( 1000 )
+            )
        </pre>
+        <p>where <kbd>getAndDisplayAnswer</kbd> is defined by</p>
+        <pre>
+        static function getAndDisplayAnswer( x : Triv ) : Process&lt;Triv&gt;{ return
+            await( enter( nameBox ) &amp;&amp; getValue( nameBox ) ) &gt;=
+            function( name : String ) : Process&lt;Triv&gt;{ return
+                putText( reply, "Hello "+name ) ; } ; }
+        </pre>
+        <p>The <kbd>enter</kbd> function returns a guard.
+        Because HTML has no
+        event specifically for the enter key being pressed, we use the
+        keypress event (defined in module <kbd>TCBHTML</kbd>) combined
+        with a filter function <kbd>isEnterKey</kbd>. </p>
+        <pre>
+        static function enter( el : Element ) : Guard&lt;Event&gt; {
+            function isEnterKey( ev : Event ) : Bool {
+                var kev = cast(ev, KeyboardEvent) ;
+                return kev.keyCode == 13 || kev.which == 13 ; }
+            return keypress( nameBox ) &amp; isEnterKey ; }
+        </pre>
        <div id="haxe:trace"></div>
     </body>
 </html>
