@@ -342,19 +342,17 @@ private class ChoiceDisabler<A> implements Disabler {
 * that fired executes.
 **/
 class AwaitP<A> extends ProcessA<A> {
-    var gps : List<GuardedProcess<A>> ;
+    var _gp : GuardedProcess<A> ;
 
-    public function new( a : List<GuardedProcess<A>>  ) {
-       gps = a ; }
+    public function new( gp : GuardedProcess<A>  ) {
+       _gp = gp ; }
 
     public override function go( k : A -> Void ) {
-        var disablers : Array<Disabler> = [] ;
+        var disabler : Disabler = null ;
         function disable() {
-            for( d in disablers ) d.disable() ;
+            disabler.disable() ;
         }
-        for( gp in gps ) {
-            var d = gp.enable( disable,  k) ;
-            disablers.push( d ) ; }
+        disabler = _gp.enable( disable, k) ;
     }
 }
 
@@ -421,9 +419,9 @@ class TBC {
     public static function loop<A>( p : Process<A> ) : Process<Triv> {
         return p.bind( function( a : A ) { return loop(p) ; } ) ; }
 
-    public static function awaitAny<A>( list : List<GuardedProcess<A>> )
-    : Process<A> {
-        return new AwaitP<A>( list ) ; }
+//    public static function awaitAny<A>( list : List<GuardedProcess<A>> )
+//    : Process<A> {
+//        return new AwaitP<A>( list ) ; }
 
     public static function await<A>(
                                 gp0 : GuardedProcess<A>,
@@ -432,12 +430,11 @@ class TBC {
                                 ?gp3 : GuardedProcess<A>,
                                 ?gp4 : GuardedProcess<A>,
                                 ?gp5 : GuardedProcess<A> ) : Process<A> {
-        var list = new List<GuardedProcess<A>>()  ;
-        list.add( gp0 ) ;
-        if( gp1 != null ) list.add(gp1) ;
-        if( gp2 != null ) list.add(gp2) ;
-        if( gp3 != null ) list.add(gp3) ;
-        if( gp4 != null ) list.add(gp4) ;
-        if( gp5 != null ) list.add(gp5) ;
-        return new AwaitP<A>( list ) ; }
+        var gp = gp0 ;
+        if( gp1 != null ) gp = gp || gp1 ;
+        if( gp2 != null ) gp = gp || gp2 ;
+        if( gp3 != null ) gp = gp || gp3 ;
+        if( gp4 != null ) gp = gp || gp4 ;
+        if( gp5 != null ) gp = gp || gp5 ;
+        return new AwaitP<A>( gp ) ; }
 }
