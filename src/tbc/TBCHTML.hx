@@ -49,9 +49,11 @@ class HTMLEventGuardA extends GuardA<Event> {
         if( el.disabled != null ) el.disabled = false ;
     }
 
-    /*abstract*/ function addHandler( k : Event -> Void ) {}
+    /*abstract*/ function addHandler( k : Event -> Void ) {
+        throw "addHandler is not defined in "+this ; }
 
-    /*abstract*/ function removeHandler( k : Event -> Void ) {}
+    /*abstract*/ function removeHandler( k : Event -> Void ) {
+        throw "removeHandler is not defined in "+this ; }
 }
 
 class ClickG extends HTMLEventGuardA {
