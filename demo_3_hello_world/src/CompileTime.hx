@@ -8,5 +8,4 @@ class CompileTime {
         var date = Date.now().toString();
         return Context.makeExpr(date, Context.currentPos());
     }
-
 }
