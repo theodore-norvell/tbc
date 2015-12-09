@@ -8,10 +8,15 @@
             blog entry</a>.  This one demonstrates timeouts and pauses.</p>
        <script type="text/javascript" src="release/controller.js"></script>
 
+    <button id="button:zero" disabled=true >Zero</button>
+    <button id="button:oneA" disabled=true >One A</button>
+    <button id="button:oneB" disabled=true >One B</button>
+    <button id="button:two" disabled=true >Two</button>
+
        <p>The TBC code is as follows.</p>
        <pre>
        loop(
-            nag( null ) &gt;
+            nag( ) &gt;
             await(
                 click( b1a ) &gt;&gt; out1A
             ||
@@ -23,23 +28,31 @@
             await( click( b2 ) &gt;&gt; out2 )
         )
        </pre>
-       <p>where the nag function is defined by</p>
-       <pre>
-       static function nag(triv : Triv) : Process&lt;Triv&gt;{ return
-           await(
-               click(b0) &amp;&amp; exec(thankTheUser)
-           ||
-               timeout( 1000 ) &amp;&amp; exec(nagTheUser) &gt;= nag
-           ) ; }
-       </pre>
        <p>A subtle change from <a href="../demo_0_blog">Demo 0</a> is the use of <kbd>||</kbd>
-          to create a choice between two guarded commands.
+            to create a choice between two guarded commands.
        </p>
-       <button id="button:zero" disabled=true >Zero</button> 
-       <button id="button:oneA" disabled=true >One A</button> 
-       <button id="button:oneB" disabled=true >One B</button> 
-       <button id="button:two" disabled=true >Two</button>
-
+       <p>The nag function returns a loop but not an infinite one. It is defined
+           as follows.
+       </p>
+       <pre>
+        static function nag() : Process&lt;Triv&gt;{
+            function f(repeat : Triv -&gt; Process&lt;Triv&gt;) : Process&lt;Triv&gt; { return
+                await(
+                    click(b0) &amp;&amp; exec(thankTheUser)
+                ||
+                    timeout( 1000 ) &amp;&amp; exec(nagTheUser) &gt;= repeat
+                ) ; }
+            return fix( f ) ;
+        }
+       </pre>
+       <p>As you can see, <kbd>nag</kbd> is defined with
+        the help of the <kbd>fix</kbd> function.
+        The <kbd>fix</kbd> function is defined so
+        that <kbd>fix(f)</kbd> returns a process <kbd>p</kbd>
+        such that <kbd>p == f( function(t:Triv){ return p ; } )</kbd>
+        So, when the result of <kbd>nag</kbd> is executed,
+        each time the <kbd>repeat</kbd> function is called, it returns
+        the very same process that is the result of calling <kbd>nag.</kbd></p>
        <div id="haxe:trace"></div>
     </body>
 </html>

@@ -283,9 +283,9 @@ private class  GuardedProcessC<A,E> extends GuardedProcessA<A> {
 
     override public function enable( first : Void -> Void, k : A -> Void ) : Disabler {
         return _guard.enable(
-            function( b : E) {
+            function( e : E) {
                 first() ;
-                _f(b).go( k ) ; } ) ; }
+                _f(e).go( k ) ; } ) ; }
 }
 
 /** A guarded process made from a GuardedProcess<A> and a function A->Process<B>.
@@ -418,6 +418,17 @@ class TBC {
 
     public static function loop<A>( p : Process<A> ) : Process<Triv> {
         return p.bind( function( a : A ) { return loop(p) ; } ) ; }
+
+    /** Create a looping process from a function.
+     * The result is a process p of type Process<A> such that
+     * p = f( function( t : Triv ) { return p ; } )
+    **/
+    public static function fix<A>( f : (Triv -> Process<A>) -> Process<A> ) {
+        var p : Process<A> = null ;
+        function fp( t : Triv ) { return p ; }
+        p = f( fp ) ;
+        return p ;
+    }
 
 //    public static function awaitAny<A>( list : List<GuardedProcess<A>> )
 //    : Process<A> {

@@ -36,7 +36,7 @@ class Controller {
 
     static function useCase() : Process<Triv> { return
         loop(
-            nag( null ) >
+            nag( ) >
             await(
                 click( b1a ) >> out1A
             ||
@@ -48,12 +48,15 @@ class Controller {
             await( click( b2 ) >> out2 ) 
         ) ; }
 
-    static function nag(triv : Triv) : Process<Triv>{ return
-        await(
-            click(b0) && exec(thankTheUser)
-        ||
-            timeout( 1000 ) && exec(nagTheUser) >= nag
-        ) ; }
+    static function nag() : Process<Triv>{
+        function f(repeat : Triv -> Process<Triv>) : Process<Triv> { return
+            await(
+                click(b0) && exec(thankTheUser)
+            ||
+                timeout( 1000 ) && exec(nagTheUser) >= repeat
+            ) ; }
+        return fix( f ) ;
+    }
 
     static public function onload() {
         var win = Browser.window ;
