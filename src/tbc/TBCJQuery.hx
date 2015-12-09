@@ -9,7 +9,7 @@ import jQuery.JQuery ;
 import jQuery.Event ;
 
 
-private class JQueryDisabler<JqEvent> implements Disabler {
+private class JQueryDisabler<Event> implements Disabler {
     var _elements : JQuery  ;
     var _eventName : String ;
     var _handler : Event -> Void ;
@@ -23,7 +23,7 @@ private class JQueryDisabler<JqEvent> implements Disabler {
     }
 
     public function disable() : Void {
-        _elements.off( _eventName, null, _handler) ;
+        _elements.off( _eventName, null , _handler) ;
     }
 }
 
