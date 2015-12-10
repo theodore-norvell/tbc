@@ -64,11 +64,10 @@ class Controller {
         Log.trace("Started at " + Date.now() );
         var p =
             loop  (
-                putText( reply, "" ) >
                 clearText( nameBox ) >
                 show( nameBox )  >
                 show( question ) >
-                getAndDisplayAnswer(null) >
+                getAndDisplayAnswer() >
                 hide( question ) >
                 hide( nameBox ) >
                 pause( 1000 )
@@ -76,13 +75,14 @@ class Controller {
         p.go( function(x:Triv) {} ) ; // Execute p
     }
 
-    static function getAndDisplayAnswer( x : Triv ) : Process<Triv>{
+    static function getAndDisplayAnswer( ) : Process<Triv>{
         return
-            // Simple non nagging version
             await( enter( nameBox ) && getValue( nameBox ) ) >=
-            function( name : String ) : Process<Triv>{ return
-                putText( reply, "Hello "+name ) ; } ;
+            hello ;
     }
+
+    static function hello( name : String ) { return
+        putText( reply, "Hello "+name ) ; }
 
     static function enter( el : Element ) : Guard<Event> {
         function isEnterKey( ev : Event ) : Bool {
@@ -90,4 +90,21 @@ class Controller {
             return kev.keyCode == 13 || kev.which == 13 ; }
         return keypress( nameBox ) & isEnterKey ;
     }
+
+    static function getAndDisplayAnswer1( ) : Process<Triv> {
+        function f( top : Triv -> Process<Triv> ) : Process<Triv> { return
+            await(
+                enter( nameBox ) && getValue( nameBox ) >= hello
+            ||
+                timeout(5000) && flash(question) > invoke(top)
+            ) ;
+        }
+        return fix( f ) ;
+    }
+
+    static function flash( el : Element ) : Process<Triv> { return
+        hide(el) > pause(100) > show(el) > pause(100) >
+        hide(el) > pause(100) > show(el) ;
+    }
+
 }

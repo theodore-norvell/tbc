@@ -19,11 +19,10 @@
        <p>The TBC code is as follows.</p>
        <pre>
            loop  (
-                putText( reply, "" ) &gt;
                 clearText( nameBox ) &gt;
                 show( nameBox )  &gt;
                 show( question ) &gt;
-                getAndDisplayAnswer(null) &gt;
+                getAndDisplayAnswer() &gt; <i>// See below</i>
                 hide( question ) &gt;
                 hide( nameBox ) &gt;
                 pause( 1000 )
@@ -31,10 +30,12 @@
        </pre>
         <p>where <kbd>getAndDisplayAnswer</kbd> is defined by</p>
         <pre>
-        static function getAndDisplayAnswer( x : Triv ) : Process&lt;Triv&gt;{ return
-            await( enter( nameBox ) &amp;&amp; getValue( nameBox ) ) &gt;=
-            function( name : String ) : Process&lt;Triv&gt;{ return
-                putText( reply, "Hello "+name ) ; } ; }
+        static function getAndDisplayAnswer( ) : Process&lt;Triv&gt; { return
+            await( enter( nameBox ) &amp;&amp; getValue( nameBox ) ) &gt;= hello ;
+        }
+
+        static function hello( name : String ) { return
+            putText( reply, "Hello "+name ) ; }
         </pre>
         <p>The <kbd>enter</kbd> function returns a guard.
         Because HTML has no
