@@ -3,18 +3,18 @@
         <title>TBC Demo 1</title>
     </head>
     <body id="body">
-    <p>Demo 1. This is based on my
-        <a href="http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html">
-            blog entry</a>.  This one demonstrates timeouts and pauses.</p>
-       <script type="text/javascript" src="release/controller.js"></script>
-
-    <button id="button:zero" disabled=true >Zero</button>
-    <button id="button:oneA" disabled=true >One A</button>
-    <button id="button:oneB" disabled=true >One B</button>
-    <button id="button:two" disabled=true >Two</button>
-
-       <p>The TBC code is as follows.</p>
-       <pre>
+        <h1>Demo 1. Timeouts, pauses, choices, and fixed poiints.</h1>
+        <p>Demo 1. This is based on my
+            <a href="http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html">
+                blog entry</a>.  This one demonstrates timeouts and pauses.</p>
+           <script type="text/javascript" src="release/controller.js"></script>
+        <p>The haxe code is <a href="Controller.hx">here</a>.</p>
+        <button id="button:zero" disabled="true" >Zero</button>
+        <button id="button:oneA" disabled="true" >One A</button>
+        <button id="button:oneB" disabled="true" >One B</button>
+        <button id="button:two" disabled="true" >Two</button>
+        <p>The TBC code is as follows.</p>
+        <pre>
        loop(
             nag( ) &gt;
             await(
@@ -28,7 +28,7 @@
             await( click( b2 ) &gt;&gt; out2 )
         )
        </pre>
-       <p>A subtle change from <a href="../demo_0_blog">Demo 0</a> is the use of <kbd>||</kbd>
+       <p>A subtle change from <a href="../demo_0_blog">Demo 0</a> is the use of <kbd>||</code>
             to create a choice between two guarded commands.
        </p>
        <p>The nag function returns a loop but not an infinite one. It is defined
@@ -45,14 +45,14 @@
             return fix( f ) ;
         }
        </pre>
-       <p>As you can see, <kbd>nag</kbd> is defined with
-        the help of the <kbd>fix</kbd> function.
-        The <kbd>fix</kbd> function is defined so
-        that <kbd>fix(f)</kbd> returns a process <kbd>p</kbd>
-        such that <kbd>p == f( function(t:Triv){ return p ; } )</kbd>
-        So, when the result of <kbd>nag</kbd> is executed,
-        each time the <kbd>repeat</kbd> function is called, it returns
-        the very same process that is the result of calling <kbd>nag.</kbd></p>
+       <p>As you can see, <code>nag</code> is defined with
+        the help of the <code>fix</code> function.
+        The <code>fix</code> function is defined so
+        that <code>fix(f)</code> returns a process <code>p</code>
+        such that <code>p == f( function(t:Triv){ return p ; } )</code>
+        So, when the result of <code>nag</code> is executed,
+        each time the <code>repeat</code> function is called, it returns
+        the very same process that is the result of calling <code>nag.</code></p>
        <div id="haxe:trace"></div>
     </body>
 </html>

@@ -2,17 +2,19 @@
     <head>
         <title>TBC Demo 3</title>
     </head>
-    <p id="body">
+    <body id="body">
         <script type="text/javascript" src="release/controller.js"></script>
+        <h1>Demo 3. Hello World.</h1>
         <p>Demo 3. This is a hello world application based on my
             <a href="http://www.engr.mun.ca/~theo/Publications/TBC-NECEC-2015-slides.pdf">
                 NECEC 2015 talk</a>.
 
             The TBC code is shown at the bottom. </p>
 
-        <label id="question" for="name">What is your name?</label>
+        <p>The haxe code is <a href="Controller.hx">here</a>.</p>
+        <label id="question" for="nameBox">What is your name?</label>
         <input  id="nameBox" type="text" name="name">
-        <label id="reply" for="name"></label>
+        <label id="reply"></label>
 
        <p>The TBC code is as follows.</p>
        <pre>
@@ -37,7 +39,8 @@
         <p>The <kbd>enter</kbd> function returns a guard.
         Because HTML has no
         event specifically for the enter key being pressed, we use the
-        keypress event (defined in module <kbd>TCBHTML</kbd>) combined
+        keypress event (defined in module <kbd>TCBHTML</kbd>) combined,
+        using the filter operator "&amp;",
         with a filter function <kbd>isEnterKey</kbd>. </p>
         <pre>
         static function enter( el : Element ) : Guard&lt;Event&gt; {
