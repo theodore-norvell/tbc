@@ -432,6 +432,10 @@ class TBC {
         return p ;
     }
 
+    public static function invoke<A>(f : Triv -> Process<A> ) : Process<A> {
+        return unit(null) >= f ;
+    }
+
 //    public static function awaitAny<A>( list : List<GuardedProcess<A>> )
 //    : Process<A> {
 //        return new AwaitP<A>( list ) ; }
