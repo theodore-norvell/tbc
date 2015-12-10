@@ -1,16 +1,71 @@
 <html>
     <head>
-        <title>TBC Demo 3</title>
+        <title>TBC Demo 4</title>
     </head>
     <body id="body">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
         <script type="text/javascript" src="release/controller.js"></script>
-        <p>Demo 4. This page demonstrates the use of jQuery with
-           TBC.
+        <h1>Demo 4. JQuery</h1>
+        <p>
+            This page demonstrates the use of jQuery with TBC.
         </p>
-
+        <p>The haxe code is <a href="Controller.hx">here</a>.</p>
+        <p>
+            One nice feature of jQuery is that it allows multiple
+            listeners to be enabled for the same event on
+            the same element at the same time. This is not
+            true --yet anyway-- for TBCHTML.
+            To determine which guard fires, we use the
+            filter operator "&amp;" to filter events.
+        </p>
         <p>The TBC code is as follows.</p>
         <pre>
-           ...
+        var body = new JQuery("body") ;
+        var p =
+            loop  (
+                await(
+                    upKey(body) &gt;&gt; preventDefault &gt; exec( bigger )
+                ,
+                    downKey(body) &gt;&gt; preventDefault &gt; exec( smaller )
+                )
+            ) ;
+        </pre>
+        <p>
+            <code>preventDefault</code> is provided by TBC and
+            prevents the key events from causing the page to scroll. </p>
+        <p>
+            To try it out, click anywhere on this page and press the up
+            down arrow keys.
+        </p>
+        <div id="square"></div>
+        <p>
+            Wasn't that fun?
+        </p>
+        <p>
+            The <code>upKey</code> and <code>downKey</code> functions use the
+            TBC's <code>jqEvent</code> function to build guards as
+            follow. Note that both guards put handlers for
+            the same event on the same element. Also note
+            the use of the "&amp;" operator to filter events.
+        </p>
+        <pre>
+            static function upKey( els : JQuery ) : Guard&lt;Event&gt; {
+                return jqEvent( els, "keydown" ) & whichIs(38) ;
+            }
+
+            static function downKey( els : JQuery ) : Guard&lt;Event&gt; {
+                return jqEvent( els, "keydown" ) &amp; whichIs(40) ;
+            }
+        </pre>
+        <p>
+            The <code>whichIs</code> function simply returns
+            a function that maps events to Booleans.
+        </p>
+        <pre>
+            static function whichIs( k : Int ) {
+                return function( ev : Event ) : Bool {
+                            var kev : Dynamic = cast ev ;
+                            return kev.which == k ; } }
         </pre>
         <div id="haxe:trace"></div>
     </body>

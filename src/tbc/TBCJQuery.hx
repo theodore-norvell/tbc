@@ -1,15 +1,17 @@
 package tbc;
 
+import tbc.TBC.Process ;
 import tbc.TBC.Guard ;
 import tbc.TBC.GuardA ;
 import tbc.TBC.Disabler ;
+import tbc.TBC.exec ;
 
 /** This module requires Andy Li's JQuery extern library */
 import jQuery.JQuery ;
 import jQuery.Event ;
 
 
-private class JQueryDisabler<Event> implements Disabler {
+private class JQueryDisabler implements Disabler {
     var _elements : JQuery  ;
     var _eventName : String ;
     var _handler : Event -> Void ;
@@ -48,5 +50,17 @@ class TBCJQuery {
                                     eventName : String )
     : Guard<Event> {
         return new JQueryG( elements, eventName ) ; }
+
+    public static function stopPropagation( ev : Event ) {
+        return exec(stopProp(ev)) ; }
+
+    private static function stopProp( ev : Event ) : Void -> Event { return
+        function() : Event { ev.stopPropagation() ; return ev ; } }
+
+    public static function preventDefault( ev : Event ) {
+        return exec(prevDef(ev)) ; }
+
+    private static function prevDef( ev : Event ) : Void -> Event { return
+        function() : Event { ev.preventDefault() ; return ev ; } }
 }
 

@@ -176,6 +176,8 @@ class FliteredGuard<E> extends GuardA<E> {
             // The event handler passed to the guard does nothing
             // if _filter(b) is false.
             function( b : E) {
+                //haxe.Log.trace("Filtered event fires "+b) ;
+                //haxe.Log.trace("Filter is " + _filter(b) ) ;
                 if( _filter(b) ) { k(b) ; } else {}
             }) ; }
 }
