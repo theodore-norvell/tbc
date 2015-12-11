@@ -425,15 +425,15 @@ class TBC {
      * The result is a process p of type Process<A> such that
      * p = f( function( t : Triv ) { return p ; } )
     **/
-    public static function fix<A>( f : (Triv -> Process<A>) -> Process<A> ) {
+    public static function fix<A>( f : (Void -> Process<A>) -> Process<A> ) {
         var p : Process<A> = null ;
-        function fp( t : Triv ) { return p ; }
+        function fp() { return p ; }
         p = f( fp ) ;
         return p ;
     }
 
-    public static function invoke<A>(f : Triv -> Process<A> ) : Process<A> {
-        return unit(null) >= f ;
+    public static function invoke<A>( f : Void -> Process<A> ) : Process<A> {
+        return exec(f) >= function(p : Process<A>) { return p ; } ;
     }
 
 //    public static function awaitAny<A>( list : List<GuardedProcess<A>> )
