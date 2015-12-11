@@ -92,7 +92,7 @@ class Controller {
     }
 
     static function getAndDisplayAnswer1( ) : Process<Triv> {
-        function f( top : Triv -> Process<Triv> ) : Process<Triv> { return
+        function f( top : Void -> Process<Triv> ) : Process<Triv> { return
             await(
                 enter( nameBox ) && getValue( nameBox ) >= hello
             ||

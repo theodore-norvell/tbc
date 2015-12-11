@@ -3,11 +3,11 @@
         <title>TBC Demo 1</title>
     </head>
     <body id="body">
-        <h1>Demo 1. Timeouts, pauses, choices, and fixed poiints.</h1>
-        <p>Demo 1. This is based on my
+        <h1>Demo 1. Timeouts, pauses, choices, and fixed points.</h1>
+        <p>This is based on my
             <a href="http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html">
                 blog entry</a>.  This one demonstrates timeouts and pauses.</p>
-           <script type="text/javascript" src="release/controller.js"></script>
+        <script type="text/javascript" src="release/controller.js"></script>
         <p>The haxe code is <a href="Controller.hx">here</a>.</p>
         <button id="button:zero" disabled="true" >Zero</button>
         <button id="button:oneA" disabled="true" >One A</button>
@@ -15,7 +15,7 @@
         <button id="button:two" disabled="true" >Two</button>
         <p>The TBC code is as follows.</p>
         <pre>
-       loop(
+        loop(
             nag( ) &gt;
             await(
                 click( b1a ) &gt;&gt; out1A
@@ -27,32 +27,67 @@
             pause(1000) &gt;
             await( click( b2 ) &gt;&gt; out2 )
         )
-       </pre>
-       <p>A subtle change from <a href="../demo_0_blog">Demo 0</a> is the use of <kbd>||</code>
+        </pre>
+        <p>A subtle change from <a href="../demo_0_blog">Demo 0</a> is the use of <code>||</code>
             to create a choice between two guarded commands.
-       </p>
-       <p>The nag function returns a loop but not an infinite one. It is defined
+        </p>
+        <p>The nag function returns a loop but not an infinite one. It is defined
            as follows.
-       </p>
-       <pre>
+        </p>
+        <pre>
         static function nag() : Process&lt;Triv&gt;{
-            function f(repeat : Triv -&gt; Process&lt;Triv&gt;) : Process&lt;Triv&gt; { return
+            function f(repeat : Void -&gt; Process&lt;Triv&gt;) : Process&lt;Triv&gt; { return
                 await(
                     click(b0) &amp;&amp; exec(thankTheUser)
                 ||
-                    timeout( 1000 ) &amp;&amp; exec(nagTheUser) &gt;= repeat
+                    timeout( 1000 ) &amp;&amp; exec(nagTheUser) &gt; invoke( repeat )
                 ) ; }
             return fix( f ) ;
         }
-       </pre>
-       <p>As you can see, <code>nag</code> is defined with
-        the help of the <code>fix</code> function.
-        The <code>fix</code> function is defined so
-        that <code>fix(f)</code> returns a process <code>p</code>
-        such that <code>p == f( function(t:Triv){ return p ; } )</code>
-        So, when the result of <code>nag</code> is executed,
-        each time the <code>repeat</code> function is called, it returns
-        the very same process that is the result of calling <code>nag.</code></p>
-       <div id="haxe:trace"></div>
+        </pre>
+        <p>
+            As you can see, <code>nag</code> is defined with
+            the help of the <code>fix</code> function.
+            The <code>fix</code> function is defined so
+            that <code>fix(f)</code> returns a process <code>p</code>
+            such that <code>p == f( function(){ return p ; } )</code>
+            So, when the result of <code>nag</code> is executed,
+            each time the <code>repeat</code> function is called, it returns
+            the very same process that is the result of calling <code>nag.</code>
+        </p>
+        <p>
+            The process <code>invoke( repeat )</code>,
+            when executed, calls <code>repeat</code> and then
+            executes the result.
+            Since the result of calling <code>repeat</code> is the same as
+            the result of <code>nag</code>, <code>invoke( repeat )</code>
+            is the same process returned from <code>nag</code>.
+            I.e. we have a loop.
+        </p>
+        <p>
+           In fact we could just invoke <code>nag</code> and that
+           would eliminate the need for <code>repeat</code> and
+           thus the need for <code>fix</code>. I.e. we could
+           rewrite the loop as
+        </p>
+        <pre>
+        static function nag() : Process&lt;Triv&gt;{ return
+            await(
+                click(b0) &amp;&amp; exec(thankTheUser)
+            ||
+                timeout( 1000 ) &amp;&amp; exec(nagTheUser) &gt; invoke( nag )
+            ) ; }
+        }
+        </pre>
+        <p>
+            Note that, in this version of the function, every time
+            <code>nag</code> is invoked, it reconstructs the process.
+            Since process objects are immutable, this make no
+            difference semantically, but it takes time and creates
+            garbage. In the version of <code>nag</code> that
+            uses <code>fix</code>, only one copy
+            of the process is constructed.
+        </p>
+        <div id="haxe:trace"></div>
     </body>
 </html>

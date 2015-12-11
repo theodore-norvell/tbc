@@ -49,11 +49,11 @@ class Controller {
         ) ; }
 
     static function nag() : Process<Triv>{
-        function f(repeat : Triv -> Process<Triv>) : Process<Triv> { return
+        function f(repeat : Void -> Process<Triv>) : Process<Triv> { return
             await(
                 click(b0) && exec(thankTheUser)
             ||
-                timeout( 1000 ) && exec(nagTheUser) >= repeat
+                timeout( 1000 ) && exec(nagTheUser) > invoke(repeat)
             ) ; }
         return fix( f ) ;
     }
