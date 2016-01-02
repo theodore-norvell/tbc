@@ -1,0 +1,139 @@
+/* CSS Document */
+
+body {
+	padding: 5% ;
+	background:#CCCCCC ;
+}
+
+.popup {
+	overflow: hidden ;
+	transition: max-height 2s ;
+}
+
+.popup.hidden { 
+	max-height: 0px ;
+}
+
+.popup.showing {
+	max-height: 10000px ;
+}
+
+.alert {
+	background: #CC3300 ;
+	font-family: sans-serif ;
+	color: white ;
+	border:thick solid black ;
+}
+
+.alert .a {
+	color: rgb(102,204,255) ;
+}
+
+#topContainer {
+	display: block ;
+	position: relative ;
+	width: 800px ;
+	height: 700px ;
+}
+
+.shim {
+	position: absolute ;
+	top: 0px ;
+	left: 0px ;
+	width: 800px ;
+	height: 700px ;
+	display: block ;
+	z-index: 1 ;
+	opacity: 1.0 ;
+}
+
+#teachingMachineContainer {
+	background:rgb(255,255,240) ;
+	position: absolute ;
+	top: 0px ;
+	left: 0px ;
+	width: 800px ;
+	height: 700px ;
+	display: block ;
+	transition: z-index 0s linear 1s, opacity 2s ;
+	-webkit-transition: z-index 0s linear 1s, opacity 2s ;
+}
+
+.onTop {
+	z-index: 2 ;
+	opacity: 1.0 ;
+}
+.onBottom {
+	z-index: 0 ;
+	opacity: 0.0 ;
+}
+
+#editorContainerContainerContainer {
+	background:rgb(255,240,255) ;
+	position: absolute ;
+	top: 0px ;
+	left: 0px ;
+	width: 800px ;
+	height: 700px ;
+	display: block ;
+	transition: z-index 0s linear 1s, opacity 2s ;
+	-webkit-transition: z-index 0s linear 1s, opacity 2s ;
+}
+	
+.editorContainerContainer {
+	position: relative ;
+	perspective: 1500px;
+	-webkit-perspective: 1500px;
+	display: block ;
+	position: relative ;
+	
+}
+
+.editorContainer {
+	position:absolute ;
+	top: 0px ;
+	left: 0px ;
+	display: block ;
+	visibility: hidden ;
+	transform: rotateY(-90deg) ;
+	-webkit-transform: rotateY(-90deg) ;
+	transition: transform 0.25s  linear  ;
+	-webkit-transition: -webkit-transform 0.25s linear ;
+}
+
+.textArea {
+	width: 600px ;
+	height: 500px ;
+	margin-left: 10% ;
+	margin-right: 10% ;
+	border-style: inset ;
+	border-width: thick ;
+	display:block ;
+}
+
+.CodeMirror {
+	width: 600px ;
+	height: 500px ;
+	margin-left: 10% ;
+	margin-right: 10% ;
+	border-style: inset ;
+	border-width: thick ;
+	background: rgb(255,255,204) ;
+}
+
+.controlTable {
+	margin-left: 10% ;
+}
+
+.disabled {
+	color: grey ;
+}
+
+button:disabled {
+	text-decoration: line-through ;
+}
+
+
+.finePrint {
+	font-size: x-small ;
+}
