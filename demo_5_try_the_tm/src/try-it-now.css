@@ -6,16 +6,23 @@ body {
 }
 
 .popup {
+	position: fixed ;
+	top: 0 ;
+	left: 50px ;
+	right: 50px ;
 	overflow: hidden ;
-	transition: max-height 2s ;
+	max-height: 10000px ;
+	transition: opacity 500ms;
 }
 
 .popup.hidden { 
-	max-height: 0px ;
+	visibility: hidden ;
+	opacity: 0 ;
 }
 
 .popup.showing {
-	max-height: 10000px ;
+	visibility: visible ;
+	opacity: 1 ;
 }
 
 .alert {

@@ -216,7 +216,7 @@ class Controller {
         runButton[JAVA] = doc.getElementById('runJavaButton') ;
 
 
-        //untyped setTMReadyCallBack( clearWarning ) ;
+        untyped setTMReadyCallBack( clearWarning ) ;
         dismissWarning.onclick = clearWarning ;
 
         Log.trace("Last compiled " + CompileTime.get() );
