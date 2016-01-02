@@ -95,6 +95,19 @@ class KeyPressG extends HTMLEventGuardA {
     }
 }
 
+class ChangeG extends HTMLEventGuardA {
+
+    public function new( el : Element ) {
+        super(el) ;
+    }
+    override function addHandler( k : Event -> Void ) {
+        _el.onchange = k ;
+    }
+    override function removeHandler( k : Event -> Void ) {
+        _el.onchange  = null ;
+    }
+}
+
 
 class TBCHTML {
     public static function click( el : Element ) : Guard<Event>{
@@ -105,4 +118,7 @@ class TBCHTML {
 
     public static function keypress( el : Element ) : Guard<Event>{
         return new KeyPressG( el ) ; }
+
+    public static function change( el : Element ) : Guard<Event>{
+        return new ChangeG( el ) ; }
 }
