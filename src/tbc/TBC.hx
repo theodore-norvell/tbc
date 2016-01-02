@@ -358,6 +358,24 @@ class AwaitP<A> extends ProcessA<A> {
     }
 }
 
+/** A process representing alternation.
+*
+**/
+class AltP<A> extends ProcessA<A> {
+    var _e : Process<Bool> ;
+    var _p : Process<A> ;
+    var _q : Process<A> ;
+
+    public function new( e : Process<Bool>, p : Process<A>, q : Process<A> ) {
+        _e = e ; _p = p ; _q = q ; }
+
+    public override function go( k : A -> Void ) {
+        _e.go(
+            function( b : Bool ) {
+                if( b ) { _p.go( k ) ; } else { _q.go( k ) ; }
+            } ) ; }
+}
+
 
 /** A process made from two process that execute in an interleaved fashion.
 *
@@ -420,6 +438,11 @@ class TBC {
 
     public static function loop<A>( p : Process<A> ) : Process<Triv> {
         return p.bind( function( a : A ) { return loop(p) ; } ) ; }
+
+    public static function alt<A>( e : Process<Bool>, p : Process<A>, q : Process<A> )
+    : Process<A> {
+        return new AltP( e, p, q ) ;
+    }
 
     /** Create a looping process from a function.
      * The result is a process p of type Process<A> such that
