@@ -12,23 +12,26 @@ body {
 	right: 50px ;
 	overflow: hidden ;
 	max-height: 10000px ;
-	transition: opacity 500ms;
+	transition:visibility 0s linear 0.5s,opacity 0.5s linear;
+	webkit-transition:visibility 0s linear 0.5s,opacity 0.5s linear;
 }
 
 .popup.hidden { 
 	visibility: hidden ;
 	opacity: 0 ;
+	webkit-transition-delay: 0s; /* Should affect only visibility. */
 }
 
 .popup.showing {
 	visibility: visible ;
+	z-index: 3 ;
 	opacity: 1 ;
 }
 
 .alert {
-	background: #CC3300 ;
+	background: #ffa64d ;
 	font-family: sans-serif ;
-	color: white ;
+	color: black ;
 	border:thick solid black ;
 }
 
