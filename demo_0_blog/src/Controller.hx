@@ -5,6 +5,7 @@ import tbc.TBC.Process ;
 import tbc.TBC.Triv ;
 import tbc.TBC.* ;
 import tbc.TBCHTML.*;
+import tbc.TBCTime.pause ;
 
 import js.Browser ;
 import js.html.Event ;
@@ -18,30 +19,33 @@ class Controller {
         body.onload = Controller.onload ; 
     }
 
+    static var outbox : Element ;
     static var b0 : Element ;
     static var b1a : Element ;
     static var b1b : Element ;
     static var b2 : Element ;
 
-    static function out0( ev : Event ) { Log.trace( "0" ) ; return skip() ;}
-    static function out1A( ev : Event ) { Log.trace( "1A" ) ; return skip() ;}
-    static function out1B( ev : Event ) { Log.trace( "1B" ) ; return skip() ;}
-    static function out2( ev : Event ) { Log.trace( "2" ) ; return skip() ;}
+    static function out(str : String) { return
+        exec( function() {
+            outbox.innerHTML = str ; return null ;
+        }) ;
+    }
 
     static function useCase() : Process<Triv> { return
         loop(
-            await( click( b0 ) >> out0  ) >
+            await( click( b0 ) && out("0")  ) >
             await(
-                click( b1a ) >> out1A
+                click( b1a ) && out("1A")
             ,
-                click( b1b ) >> out1B
+                click( b1b ) && out("1B")
             ) >
-            await( click( b2 ) >> out2 )
+            await( click( b2 ) && out("2") )
         ) ; }
 
     static public function onload() {
         var win = Browser.window ;
         var doc = win.document ;
+        outbox = doc.getElementById("outbox") ;
         b0 = doc.getElementById( "button:zero" ) ;
         b1a = doc.getElementById( "button:oneA" ) ;
         b1b = doc.getElementById( "button:oneB" ) ;

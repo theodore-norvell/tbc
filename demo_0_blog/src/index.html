@@ -1,31 +1,38 @@
 <html>
     <head>
         <title>TBC Demo 0</title>
+        <meta charset="utf-8"/>
+        <link rel="stylesheet" href="../frontpage/tbc.css">
     </head>
     <body id="body">
+        <script type="text/javascript" src="release/controller.js"></script>
+
+       <p><a href="../frontpage/index.html#demos">Back to demo list.</a></p>
        <h1>Demo 0. Introducing TBC.</h1>
        <p>Demo 0. This is based on my
            <a href="http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html">
-           blog entry</a>.</p>
-       <p>The haxe code is <a href="Controller.hx">here</a>.</p>
-       <p>The TBC code is as follows.</p>
-       <pre>
-       loop(
-            await( click( b0 ) &gt;&gt; out0  ) &gt;
-            await(
-                click( b1a ) &gt;&gt; out1A
-            ,
-                click( b1b ) &gt;&gt; out1B
-            ) &gt;
-            await( click( b2 ) &gt;&gt; out2 )
-        )
-       </pre>
-       <script type="text/javascript" src="release/controller.js"></script>
+           blog entry</a>.
+       </p>
        <button id="button:zero" disabled="true" >Zero</button>
        <button id="button:oneA" disabled="true" >One A</button>
        <button id="button:oneB" disabled="true" >One B</button>
        <button id="button:two" disabled="true" >Two</button>
-
+        <p>
+            <span id="outbox" class="outbox"></span>
+        </p>
+       <p>The TBC code is as follows.</p>
+       <pre>
+       loop(
+            await( click( b0 ) &amp;&amp; out("0")  ) &gt;
+            await(
+                click( b1a ) &amp;&amp; out("1A")
+            ,
+                click( b1b ) &amp;&amp; out("1B")
+            ) &gt;
+            await( click( b2 ) &amp;&amp; out("2" )
+        )
+       </pre>
+       <p>The haxe code is <a href="Controller.hx">here</a>.</p>
        <div id="haxe:trace"></div>
     </body>
 </html>

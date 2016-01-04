@@ -1,9 +1,12 @@
 <html>
     <head>
         <title>TBC Demo 3</title>
+        <meta charset="utf-8"/>
+        <link rel="stylesheet" href="../frontpage/tbc.css">
     </head>
     <body id="body">
         <script type="text/javascript" src="release/controller.js"></script>
+        <p><a href="../frontpage/index.html#demos">Back to demo list.</a></p>
         <h1>Demo 3. Hello World.</h1>
         <p>Demo 3. This is a hello world application based on my
             <a href="http://www.engr.mun.ca/~theo/Publications/TBC-NECEC-2015-slides.pdf">
@@ -11,7 +14,6 @@
 
             The TBC code is shown at the bottom. </p>
 
-        <p>The haxe code is <a href="Controller.hx">here</a>.</p>
         <label id="question" for="nameBox">What is your name?</label>
         <input  id="nameBox" type="text" name="name">
         <label id="reply"></label>
@@ -50,6 +52,8 @@
                 return kev.keyCode == 13 || kev.which == 13 ; }
             return keypress( nameBox ) &amp; isEnterKey ; }
         </pre>
-       <div id="haxe:trace"></div>
+        <p>The haxe code is <a href="Controller.hx">here</a>.</p>
+
+        <div id="haxe:trace"></div>
     </body>
 </html>

@@ -1,0 +1,43 @@
+body {
+	font-family:Tahoma, Geneva, sans-serif ;
+}
+
+h1, h2, h3 {
+	font-family: "Arial Black", Gadget, sans-serif ;
+	font-weight: bold ;
+}
+
+.outbox {
+	font-family: "Arial Black", Gadget, sans-serif ;
+	font-weight: bold ;
+	font-size: large ;
+	color: black ;
+	border:thick solid black ;
+}
+
+.popup {
+	position: fixed ;
+	top: 0 ;
+	left: 50px ;
+	right: 50px ;
+	overflow: hidden ;
+	max-height: 10000px ;
+	transition:visibility 0s linear 0.5s,opacity 0.5s linear;
+	webkit-transition:visibility 0s linear 0.5s,opacity 0.5s linear;
+}
+
+.popup.hidden {
+	visibility: hidden ;
+	opacity: 0 ;
+	webkit-transition-delay: 0s; /* Should affect only visibility. */
+}
+
+.popup.showing {
+	visibility: visible ;
+	z-index: 3 ;
+	opacity: 1 ;
+}
+
+button:disabled {
+	text-decoration: line-through ;
+}

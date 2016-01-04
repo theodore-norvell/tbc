@@ -1,26 +1,33 @@
 <html>
     <head>
         <title>TBC Demo 2</title>
+        <meta charset="utf-8"/>
+        <link rel="stylesheet" href="../frontpage/tbc.css">
     </head>
     <body id="body">
-    <h1>Demo 2. Parallelism and pauses.</h1>
-    <p>Demo 2. This is based on my
-        <a href="http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html">
-            blog entry</a>.  This one demonstrates parallelism and pauses.</p>
-       <script type="text/javascript" src="release/controller.js"></script>
-       <p>The haxe code is <a href="Controller.hx">here</a>.</p>
+        <script type="text/javascript" src="release/controller.js"></script>
 
-       <p>The TBC code is as follows.</p>
-       <pre>
+        <p><a href="../frontpage/index.html#demos">Back to demo list.</a></p>
+        <h1>Demo 2. Parallelism and pauses.</h1>
+        <p>Demo 2. This is based on my
+            <a href="http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html">
+                blog entry</a>.  This one demonstrates parallelism and pauses.
+        </p>
+        <p>
+            <span id="outbox" class="outbox"></span>
+        </p>
+        <p>The TBC code is as follows.</p>
+        <pre>
        loop(
             par(
-                exec(out("x0")) > pause(1000) > exec(out("x1"))
+                out("x0") > pause(1000) > out("x1")
                 ,
-                exec(out("y0")) > pause(1000) > exec(out("y1"))
+                out("y0") > pause(1000) > out("y1")
             ) >
             pause(1000)
         )
-       </pre>
-       <div id="haxe:trace"></div>
+        </pre>
+        <p>The haxe code is <a href="Controller.hx">here</a>.</p>
+        <div id="haxe:trace"></div>
     </body>
 </html>

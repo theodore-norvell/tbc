@@ -19,41 +19,41 @@ class Controller {
         var body = doc.body ;
         body.onload = Controller.onload ; 
     }
+
+    static var outbox : Element ;
     static var b0 : Element ;
     static var b1a : Element ;
     static var b1b : Element ;
     static var b2 : Element ;
 
-    static function out0( ev : Event ) { Log.trace( "0" ) ; return skip() ;}
-    static function out1A( ev : Event ) { Log.trace( "1A" ) ; return skip() ;}
-    static function out1B( ev : Event ) { Log.trace( "1B" ) ; return skip() ;}
-    static function out2( ev : Event ) { Log.trace( "2" ) ; return skip() ;}
-    static function tooLate( triv : Triv ) { Log.trace( "too slow" ) ; return skip() ;}
-    static function nagTheUser(  ) : Triv {
-        Log.trace( "Hurry up" ) ; return null ; }
-    static function thankTheUser(  ) : Triv {
-        Log.trace( "Thankyou" ) ; return null ; }
+    static function out(str : String) { return
+        exec( function() {
+            outbox.innerHTML = str ;
+            return null ; }) ;
+    }
+    static function nagTheUser(  ) {
+        return out( "hurry up" ) > pause(500) > out("") ; }
 
     static function useCase() : Process<Triv> { return
         loop(
             nag( ) >
             await(
-                click( b1a ) >> out1A
+                click( b1a ) && out("1A")
             ||
-                click( b1b ) >> out1B
+                click( b1b ) && out("1B")
             ||
-                timeout( 2000 ) >> tooLate
+                timeout( 2000 ) && out( "too slow" )
             ) >
             pause(1000) >
-            await( click( b2 ) >> out2 ) 
+            await( click( b2 ) && out("2") )
         ) ; }
 
     static function nag() : Process<Triv>{
         function f(repeat : Void -> Process<Triv>) : Process<Triv> { return
             await(
-                click(b0) && exec(thankTheUser)
+                click(b0) && out("0")
             ||
-                timeout( 1000 ) && exec(nagTheUser) > invoke(repeat)
+                timeout( 1500 ) && nagTheUser() > invoke(repeat)
             ) ; }
         return fix( f ) ;
     }
@@ -61,8 +61,8 @@ class Controller {
     static public function onload() {
         var win = Browser.window ;
         var doc = win.document ;
+        outbox = doc.getElementById("outbox") ;
         b0 = doc.getElementById( "button:zero" ) ;
-        //b0 = doc.getElementById( "body" ) ;
         b1a = doc.getElementById( "button:oneA" ) ;
         b1b = doc.getElementById( "button:oneB" ) ;
         b2 = doc.getElementById( "button:two" ) ;
