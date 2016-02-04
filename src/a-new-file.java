@@ -1,2 +1,3 @@
 class Hello {
+     int hello() { }
 }
