@@ -447,16 +447,42 @@ class TBC {
     /** Create a looping process from a function.
      * The result is a process p of type Process<A> such that
      * p = f( function( t : Triv ) { return p ; } )
+     * It is a precondition that f should not call its argument.
     **/
     public static function fix<A>( f : (Void -> Process<A>) -> Process<A> ) {
         var p : Process<A> = null ;
-        function fp() { return p ; }
+        function fp() {
+            // TODO Check that p is not null.
+            return p ; }
         p = f( fp ) ;
         return p ;
     }
 
-    public static function invoke<A>( f : Void -> Process<A> ) : Process<A> {
-        return exec(f) >= function(p : Process<A>) { return p ; } ;
+    public static function invoke<A>( fp : Void -> Process<A> ) : Process<A> {
+        // This differs from exec(fp) in type. The result of exec(fp)
+        // is a Process<Process<A>>.  So `foo > exec(fp)` would not
+        // acually run the result of fp when run.
+        // It differs from fp() in the time of the execution of fp.
+        // For example in `foo > fp()`, fp is called when the > operator
+        // is executed; in `foo > invoke( fp )`, fp is called after foo
+        // has run.
+        //
+        // Consdier this example:
+        //   static function nag() : Process<Triv>{
+        //       function f(repeat : Void -> Process<Triv>) : Process<Triv> { return
+        //           await(
+        //               click(b0) && out("0")
+        //           ||
+        //               timeout( 1500 ) && nagTheUser() > invoke( repeat )
+        //           ) ; }
+        //       return fix( f ) ;
+        //   }
+        // If we replace invoke( repeat ) with repeat(), then
+        //   repeat will be called when f is called.
+        // If you peek at the definition of fix, we can see that f is
+        // called within the execution of fix and that the result of
+        // calling repeat() would then be null.
+        return exec(fp) >= function(p : Process<A>) { return p ; } ;
     }
 
 //    public static function awaitAny<A>( list : List<GuardedProcess<A>> )
