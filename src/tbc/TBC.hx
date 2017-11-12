@@ -109,10 +109,10 @@ private class AttemptP<A> extends ProcessA<A> {
     public function new( p : Process<A>, f : Dynamic -> Process<A> ) {
         _p = p ; _f = f ; }
 
-    public override function go( k : A -> Void, h : Dynamic -> Void ) {
-        // TODO.  Can this even be done?
-        // We need to make sure that attempt(p, h).bind( function(a:A)(Z) )
-        // does not use h as the exception handler for exceptions that happen in Z.
+    public override function go( k : A -> Void, h : Dynamic -> Void ) : Void {
+        _p.go( k,
+               function( ex : Dynamic){ _f(ex).go( k, h) ; }
+        ) ;
     }
 }
 
@@ -494,7 +494,7 @@ class TBC {
     /** Toss an exception.
     **/
     public static function toss<A>( ex : Dynamic ) : Process<A> {
-        return new TossP(ex) ;
+        return new TossP<A>(ex) ;
     }
 
     /** Catch an exception.
