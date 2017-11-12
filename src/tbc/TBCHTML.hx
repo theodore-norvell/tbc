@@ -35,13 +35,13 @@ class HTMLEventGuardA extends GuardA<Event> {
     public function new( el : Element ) {
         _el = el ; }
 
-    override public function enable( k : Event -> Void ) : Disabler  {
+    override public function enable( k : Event -> Void, h : Dynamic -> Void ) : Disabler  {
 // In future we would like to be able to have multiple enables
 // at the same time.
-        addHandler(k) ;
+        addHandler(k, h) ;
         enableElement( ) ;
         return new ElementDisabler( _el,
-            function() { this.removeHandler(k) ; } ) ;
+            function() { this.removeHandler(k, h) ; } ) ;
     }
 
     function enableElement( ) {
@@ -49,11 +49,11 @@ class HTMLEventGuardA extends GuardA<Event> {
         if( el.disabled != null ) el.disabled = false ;
     }
 
-    /*abstract*/ function addHandler( k : Event -> Void ) {
-        throw "addHandler is not defined in "+this ; }
+    /*abstract*/ function addHandler( k : Event -> Void, h : Dynamic -> Void ) {
+        h( "addHandler is not defined in "+this ) ; }
 
-    /*abstract*/ function removeHandler( k : Event -> Void ) {
-        throw "removeHandler is not defined in "+this ; }
+    /*abstract*/ function removeHandler( k : Event -> Void, h : Dynamic -> Void ) {
+        h("removeHandler is not defined in "+this ) ; }
 }
 
 class ClickG extends HTMLEventGuardA {
@@ -61,10 +61,10 @@ class ClickG extends HTMLEventGuardA {
     public function new( el : Element ) {
         super(el) ;
     }
-    override function addHandler( k : Event -> Void ) {
+    override function addHandler( k : Event -> Void, h : Dynamic -> Void ) {
         _el.onclick = k ;
     }
-    override function removeHandler( k : Event -> Void ) {
+    override function removeHandler( k : Event -> Void, h : Dynamic -> Void ) {
         _el.onclick  = null ;
     }
 }
@@ -74,10 +74,10 @@ class SubmitG extends HTMLEventGuardA {
     public function new( el : Element ) {
         super(el) ;
     }
-    override function addHandler( k : Event -> Void ) {
+    override function addHandler( k : Event -> Void, h : Dynamic -> Void ) {
         _el.onsubmit = k ;
     }
-    override function removeHandler( k : Event -> Void ) {
+    override function removeHandler( k : Event -> Void, h : Dynamic -> Void ) {
         _el.onsubmit  = null ;
     }
 }
@@ -87,10 +87,10 @@ class KeyPressG extends HTMLEventGuardA {
     public function new( el : Element ) {
         super(el) ;
     }
-    override function addHandler( k : Event -> Void ) {
+    override function addHandler( k : Event -> Void, h : Dynamic -> Void ) {
         _el.onkeypress = k ;
     }
-    override function removeHandler( k : Event -> Void ) {
+    override function removeHandler( k : Event -> Void, h : Dynamic -> Void ) {
         _el.onkeypress  = null ;
     }
 }
@@ -100,10 +100,10 @@ class ChangeG extends HTMLEventGuardA {
     public function new( el : Element ) {
         super(el) ;
     }
-    override function addHandler( k : Event -> Void ) {
+    override function addHandler( k : Event -> Void, h : Dynamic -> Void ) {
         _el.onchange = k ;
     }
-    override function removeHandler( k : Event -> Void ) {
+    override function removeHandler( k : Event -> Void, h : Dynamic -> Void ) {
         _el.onchange  = null ;
     }
 }

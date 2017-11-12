@@ -68,7 +68,8 @@ class Controller {
         b2 = doc.getElementById( "button:two" ) ;
         Log.trace("Last compiled " + CompileTime.get() );
         Log.trace("Started at " + Date.now() );
-        useCase().go( function(x:Triv) : Void { }  ) ;
+        useCase().go( function(x:Triv) : Void { },
+                      function( ex : Dynamic ) trace( "Exception " + ex )  ) ;
         Log.trace("going");
     }
 }

@@ -222,6 +222,7 @@ class Controller {
         Log.trace("Last compiled " + CompileTime.get() );
         Log.trace("Started at " + Date.now() );
         var p = initialState() ;
-        p.go( function(x:Triv) {} ) ; // Execute p
+        p.go( function(x:Triv) {},
+                       function( ex : Dynamic ) trace( "Exception " + ex ) ) ; // Execute p
     }
 }

@@ -45,7 +45,8 @@ class Controller {
         outbox = doc.getElementById("outbox") ;
         Log.trace("Last compiled " + CompileTime.get() );
         Log.trace("Started at " + Date.now() );
-        useCase().go( function(x:Triv) : Void { }  ) ;
+        useCase().go( function(x:Triv) : Void { },
+                      function( ex : Dynamic ) trace( "Exception " + ex )  ) ;
         Log.trace("going");
     }
 }

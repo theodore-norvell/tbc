@@ -16,7 +16,7 @@ interface ProcessI<A> {
     public function sc<B>( b : Process<B> ) : Process<B> ;
 
     /** Run or execute the process. */
-    public function go(  f : A -> Void ) : Void ;
+    public function go(  k : A -> Void, h : Dynamic -> Void ) : Void ;
 }
 
 /** A type representing processes computing values of type A.
@@ -41,8 +41,8 @@ abstract Process<A>( ProcessI<A> ) to ProcessI<A> from ProcessI<A> {
     }
 
     /** See ProcessI.go */
-    public inline function go( k : A -> Void ) {
-        (this:ProcessI<A>).go(k) ; }
+    public inline function go( k : A -> Void, h : Dynamic -> Void ) {
+        (this:ProcessI<A>).go(k, h) ; }
 }
 
 /** An "abstract class" for processes.
@@ -63,8 +63,8 @@ class ProcessA<A> implements ProcessI<A> {
     }
 
     /** See ProcessI.go */
-    public function go( k : A -> Void ) {
-        throw "go is not defined in "+this ; }
+    public function go( k : A -> Void, h : Dynamic -> Void ) {
+        h( "go is not defined in "+this ) ; }
 }
 
 /** A process that executes two processes sequentially. */
@@ -75,8 +75,8 @@ private class ThenP<A,B> extends ProcessA<B> {
     public function new( left : Process<A>, right : A -> Process<B> ) {
        _left = left ; _right = right ; }
 
-    public override function go( f : B -> Void ) {
-        _left.go( function(a:A) _right(a).go( f ) ) ; }
+    public override function go( f : B -> Void, h : Dynamic -> Void ) {
+        _left.go( function(a:A) _right(a).go(f, h), h) ; }
 }
 
 /** A process that calls a function. */
@@ -86,8 +86,34 @@ private class ExecP<A> extends ProcessA<A> {
     public function new( f : Void -> A ) {
        _f = f ; }
 
-    public override function go( k : A -> Void ) {
-        k(_f()); }
+    public override function go( k : A -> Void, h : Dynamic -> Void ) {
+        try k(_f()) catch( ex : Dynamic ) { h(ex) ; } ; }
+}
+
+/** A process that tosses an exception. */
+private class TossP<A> extends ProcessA<A> {
+    var _ex : Dynamic ;
+
+    public function new( ex : Dynamic ) {
+        _ex = ex ; }
+
+    public override function go( k : A -> Void, h : Dynamic -> Void ) {
+        h( _ex ) ; }
+}
+
+/** A process that attempts to run p and recovers by running m(ex). */
+private class AttemptP<A> extends ProcessA<A> {
+    var _p : Process<A> ;
+    var _f : Dynamic -> Process<A> ;
+
+    public function new( p : Process<A>, f : Dynamic -> Process<A> ) {
+        _p = p ; _f = f ; }
+
+    public override function go( k : A -> Void, h : Dynamic -> Void ) {
+        // TODO.  Can this even be done?
+        // We need to make sure that attempt(p, h).bind( function(a:A)(Z) )
+        // does not use h as the exception handler for exceptions that happen in Z.
+    }
 }
 
 /** Guards return a Disabler when enabled.
@@ -103,7 +129,7 @@ interface Disabler {
 interface GuardI<E> {
     /** Enable the guard.
     * When fired, the guard will execute k. **/
-    public function enable( k : E -> Void ) : Disabler  ;
+    public function enable( k : E -> Void, h : Dynamic -> Void ) : Disabler  ;
     /** Create a guarded process. **/
     public function guarding<A>( k : E -> Process<A> ) : GuardedProcess<A> ;
     /** Create a guarded process. **/
@@ -123,8 +149,8 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
     }
 
     /** See GuardI.enable **/
-    public inline function enable( k : E -> Void ) : Disabler {
-        return (this:GuardI<E>).enable( k ) ; }
+    public inline function enable( k : E -> Void, h : Dynamic -> Void ) : Disabler {
+        return (this:GuardI<E>).enable( k, h ) ; }
 
     /** See GuardI.guarding **/
     @:op( A >> B )
@@ -152,8 +178,8 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
 * .enable.
 **/
 class GuardA<E> implements GuardI<E> {
-    public function enable( k : E -> Void ) : Disabler {
-        throw "Method enable not overridden in " + this ; return null ; }
+    public function enable( k : E -> Void, h : Dynamic -> Void ) : Disabler {
+        h("Method enable not overridden in " + this) ; return null ; }
 
     public function guarding<A>( k : E -> Process<A> ) : GuardedProcess<A> {
         return new GuardedProcessC<A,E>( this, k ) ; }
@@ -168,10 +194,11 @@ class GuardA<E> implements GuardI<E> {
 class FliteredGuard<E> extends GuardA<E> {
     var _guard : Guard<E> ;
     var _filter : E -> Bool ;
+
     public function new( guard: Guard<E>, c : E -> Bool ) {
         _guard = guard ; _filter = c ; }
 
-    override public function enable( k : E -> Void ) : Disabler {
+    override public function enable( k : E -> Void, h : Dynamic -> Void ) : Disabler {
         return _guard.enable(
             // The event handler passed to the guard does nothing
             // if _filter(b) is false.
@@ -179,7 +206,8 @@ class FliteredGuard<E> extends GuardA<E> {
                 //haxe.Log.trace("Filtered event fires "+b) ;
                 //haxe.Log.trace("Filter is " + _filter(b) ) ;
                 if( _filter(b) ) { k(b) ; } else {}
-            }) ; }
+            },
+            h) ; }
 }
 
 
@@ -208,7 +236,7 @@ interface GuardedProcessI<A> {
     * If an enabled guarded process fires, it executes the first routine first,
     * then it executes itself, finally it calls k with the result.
     **/
-    public function enable( first : Void -> Void, k : A -> Void ) : Disabler ;
+    public function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler ;
 
 }
 
@@ -237,8 +265,8 @@ to GuardedProcessI<A> from GuardedProcessI<A> {
         return new GuardedProcess<A>( (this:GuardedProcessI<A>).orElse( (gp : GuardedProcess<A>) ) ) ;
     }
 
-    public inline function enable( first : Void -> Void, k : A -> Void ) : Disabler {
-        return (this:GuardedProcessI<A>).enable( first, k) ;
+    public inline function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler {
+        return (this:GuardedProcessI<A>).enable( first, k, h) ;
     }
 }
 
@@ -270,8 +298,8 @@ class GuardedProcessA<A> implements GuardedProcessI<A>{
     }
 
     /** Enable the guard associated with the guarded process. */
-    public function enable( first : Void -> Void, k : A -> Void ) : Disabler  {
-        throw "enable is not defined in "+this ; }
+    public function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler  {
+        h("enable is not defined in "+this) ; return null ; }
 }
 
 /** A guarded process made from a Guard<E> and a function E->Process<A>
@@ -283,11 +311,12 @@ private class  GuardedProcessC<A,E> extends GuardedProcessA<A> {
     public function new( guard: Guard<E>, f : E -> Process<A> ) {
         _guard = guard ; _f = f ; }
 
-    override public function enable( first : Void -> Void, k : A -> Void ) : Disabler {
+    override public function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler {
         return _guard.enable(
             function( e : E) {
                 first() ;
-                _f(e).go( k ) ; } ) ; }
+                _f(e).go( k, h ) ; },
+            h ) ; }
 }
 
 /** A guarded process made from a GuardedProcess<A> and a function A->Process<B>.
@@ -301,10 +330,11 @@ private class  ThenGP<A,B> extends GuardedProcessA<B> {
         _gp = gp ;
         _f = f ; }
 
-    override public function enable( first : Void -> Void, k : B -> Void ) : Disabler {
+    override public function enable( first : Void -> Void, k : B -> Void, h : Dynamic -> Void ) : Disabler {
         return _gp.enable(first,
             function( a : A) {
-                _f(a).go( k ) ; } ) ; }
+                _f(a).go( k, h ) ; },
+            h) ; }
 }
 
 /** A guarded process made choice of two guarded processes.
@@ -318,9 +348,9 @@ private class  ChoiceGP<A> extends GuardedProcessA<A> {
         _gp0 = gp0 ;
         _gp1 = gp1 ; }
 
-    override public function enable( first : Void -> Void, k : A -> Void ) : Disabler {
-        var d0 = _gp0.enable(first, k ) ;
-        var d1 = _gp1.enable(first, k ) ;
+    override public function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler {
+        var d0 = _gp0.enable(first, k, h ) ;
+        var d1 = _gp1.enable(first, k, h ) ;
         return new ChoiceDisabler( d0, d1 ) ;
     }
 
@@ -349,12 +379,12 @@ class AwaitP<A> extends ProcessA<A> {
     public function new( gp : GuardedProcess<A>  ) {
        _gp = gp ; }
 
-    public override function go( k : A -> Void ) {
+    public override function go( k : A -> Void, h : Dynamic -> Void ) {
         var disabler : Disabler = null ;
         function disable() {
             disabler.disable() ;
         }
-        disabler = _gp.enable( disable, k) ;
+        disabler = _gp.enable(disable, k, h) ;
     }
 }
 
@@ -369,11 +399,10 @@ class AltP<A> extends ProcessA<A> {
     public function new( e : Process<Bool>, p : Process<A>, q : Process<A> ) {
         _e = e ; _p = p ; _q = q ; }
 
-    public override function go( k : A -> Void ) {
-        _e.go(
-            function( b : Bool ) {
-                if( b ) { _p.go( k ) ; } else { _q.go( k ) ; }
-            } ) ; }
+    public override function go( k : A -> Void, h : Dynamic -> Void ) {
+        _e.go( function( b : Bool ) {
+                if( b ) { _p.go( k, h ) ; } else { _q.go( k, h ) ; } },
+               h) ; }
 }
 
 
@@ -387,17 +416,19 @@ class Par2P<A,B> extends ProcessA<Pair<A,B>> {
     public function new( p : Process<A>, q : Process<B> ) {
         _p = p ; _q = q ; }
 
-    public override function go( k : Pair<A,B> -> Void ) {
+    public override function go( k : Pair<A,B> -> Void, h : Dynamic -> Void ) {
         var result = new Pair<A,B>() ;
         var completed = 0 ;
         _p.go( function( a : A ) : Void {
-            result._left = a ;
-            completed++ ;
-            if( completed == 2 ) k(result) ; } ) ;
+                   result._left = a ;
+                   completed++ ;
+                   if( completed == 2 ) k(result) ; },
+            h ) ;
         _q.go( function( b : B ) : Void {
-            result._right = b ;
-            completed++ ;
-            if( completed == 2 ) k(result) ; } ) ;
+                   result._right = b ;
+                   completed++ ;
+                   if( completed == 2 ) k(result) ; },
+            h ) ;
     }
 }
 
@@ -449,20 +480,37 @@ class TBC {
      * p = f( function( t : Triv ) { return p ; } )
      * It is a precondition that f should not call its argument.
     **/
-    public static function fix<A>( f : (Void -> Process<A>) -> Process<A> ) {
+    public static function fix<A>( f : (Void -> Process<A>) -> Process<A> ) : Process<A> {
         var p : Process<A> = null ;
         function fp() {
-            // TODO Check that p is not null.
-            return p ; }
+            if( p==null )
+                return toss("TBC Error in fix. Possibly a missing invoke?") ;
+            else
+                return p ; }
         p = f( fp ) ;
         return p ;
     }
 
+    /** Toss an exception.
+    **/
+    public static function toss<A>( ex : Dynamic ) : Process<A> {
+        return new TossP(ex) ;
+    }
+
+    /** Catch an exception.
+    **/
+    public static function attempt<A>( p : Process<A>, f : Dynamic -> Process<A> ) : Process<A> {
+        return new AttemptP(p, f) ;
+    }
+
+    /** Run the process returned by a function.
+    *
+    **/
     public static function invoke<A>( fp : Void -> Process<A> ) : Process<A> {
         // This differs from exec(fp) in type. The result of exec(fp)
         // is a Process<Process<A>>.  So `foo > exec(fp)` would not
         // acually run the result of fp when run.
-        // It differs from fp() in the time of the execution of fp.
+        // It differs from fp() in the time of the invocation of fp.
         // For example in `foo > fp()`, fp is called when the > operator
         // is executed; in `foo > invoke( fp )`, fp is called after foo
         // has run.

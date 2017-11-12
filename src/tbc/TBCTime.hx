@@ -26,7 +26,7 @@ class TimeOutGuard extends GuardA<Triv> {
         _timeInMiliSecs = timeInMiliSecs ;
     }
 
-    public override function enable( k : Triv -> Void ) : Disabler  {
+    public override function enable( k : Triv -> Void, h : Dynamic -> Void ) : Disabler  {
         return new MyTimer( _timeInMiliSecs,  k ) ;
     }
 }

@@ -72,7 +72,8 @@ class Controller {
                 hide( nameBox ) >
                 pause( 1000 )
             ) ;
-        p.go( function(x:Triv) {} ) ; // Execute p
+        p.go( function(x:Triv) {},
+              function( ex : Dynamic ) trace( "Exception " + ex ) ) ; // Execute p
     }
 
     static function getAndDisplayAnswer( ) : Process<Triv>{
