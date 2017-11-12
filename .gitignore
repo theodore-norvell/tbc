@@ -16,3 +16,4 @@ out/production/tbc/tbc/TBCHTML.hx
 out/production/tbc/tbc/TBCTime.hx
 
 *.iml
+*.dump

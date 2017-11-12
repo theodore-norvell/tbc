@@ -1,0 +1,130 @@
+Dealing with things like ajax calls that might succeed or fail.
+
+Alternative (a)  Build on the existing choice mechanism that is
+based on await.
+
+Suppose foo is a process that makes an ajax call or something similar and
+computes a pair of guards.  And s and f are functions that return
+a Process<A>.  Then
+   choose( foo, s, f )
+is a Process<A>.   And similarly for triples, etc.
+
+   foo >= function( p : Pair<Guard<S>, Guard<F> ) { return 
+      await(
+          p.first() >> s 
+      ||
+          p.second() >> f ) ; }
+
+Pro: Needs nothing new.
+
+Alternative (b): Build on the exception handling mechanism (Process2). See below.
+
+In this case an ajax call would be represented by a Process2<A,B> where
+A and B are the results from the call for the success and failure cases.
+
+Pro:  We might want Process2 anyway.
+Con: Exceptions are ugly and Process2 isn't that much better.
+
+----
+
+Exception and exception handling.
+
+A Process2<A,B> is a process that may succeed or fail.
+
+If p is an Process2<A,B> and m is A->Process<C> and n is B->Process<C> then
+   p.bind(m, n) is a Process<C>
+
+If p is an Process2<A,B> and m is an A->Process<C>, then
+    p >= m is an Process2<C,B>
+If p is an Process2<A,B> and m is an A->Process2<C,B> then
+    p >= m is an Process2<C,B>
+If p is a Process<A> and m is an A->Process2<C,B> then
+    p >= m is an Process2<A,B>
+
+If a is an A
+   leftUnit2(a)  is a Process<A,B>  (for any B)
+   (Do we need to write leftUnit2<B>(a) ?)
+   (Rename to succeed? )
+
+If b is an B
+   rightUnit2(b)  is a Process<A,B>  (for any A)
+   (Do we need to write rightUnit2<A>(b) ?)
+   (Rename to fail?)
+
+If p is an Process2<A,B> and n is an B->Process<A> then
+   p.recover(n) is a Process<A>
+   p.recover(n) === p.bind(function(x:A){return unit(x);}, n) 
+
+Propagating exceptions:  Suppose p is a Process2<A,E0> and m is a function A->Process<B>
+    p.bind(m)   is a Process2<B, E0>
+
+Stacking exceptions: Suppose p is a Process2<A,E0> and m is a function A->Process2<B,E1>
+    p.bind(m)   is a Process2<B,Option<E0,E1>>
+
+------
+
+So I don't like the exception handling ideas above.  But we do need a way to deal with
+exceptions that happen in functions like exec.  I think the best way is to add an optional
+exception handler to "go". So if p is a Process<A>, f is a function of type A->Void and h
+is a function of type Dynamic->Void
+   p.go( f, h )
+
+So, for example
+    exec( k ).go( f, h ) would be
+        try f( k() ) catch( e : Dynamic ) h( e )
+
+    p.bind( m ).go(f, h) would be
+        p.go( function( b ) { m(b).go( f, h) }, h )
+    or maybe
+        p.go( function( b ) { try m(b).go( f, h ) catch( e : Dynamic ) h(e) ; }, h )
+    The later also catches errors in the execution of m.
+
+    Possible new operation
+       chuck( e ) is a Process<A> for every A
+       chuck(e).go( f, h) is equivalent to h(e)
+
+    Possible new operation
+       p.snatch( g ) is a Process<A> where p is a Process<A> and g is a Dynamic->A
+    p.snatch( g ).go( f, h ) is equivalent to
+        p.go( f, function( e : Dynamic ) { try f( g(e) ) catch( e1: Dynamic ) h(e1) ; } )
+
+    Maybe instead of Dynamic use a class that two subclasses. One for wrapped
+    exceptions and one for exceptions from chuck.
+    
+-----
+
+Macros
+
+Thoughts on a "do" macro
+    seq( { var x = E;
+          var y : T = F;
+          G;
+          H; } )
+should compile to 
+        E.bind(
+           function( x ) { return
+                F.bind(
+                    function( y : T ) { return 
+                        G.sc( H ) ; } ) ; } )
+ 
+We could maybe also use a macro "lazy" so that 
+    lazy( E )
+is expands to
+    exec( function() { return E; } )
+
+I.e., lazy( E ) has the same type as unit( E ). If the type of E is A, both are Process<A>.
+The difference is that with unit(E), E is evaluated when the process is created. In the
+case of lazy(E), E is evaluated when the process is executed.
+
+----
+
+Thoughts on internal communication.
+
+bufferedChan<M>()  is a process of type Process<BufferedChan<M>>.
+synchronousChan<M>() is a process of type Process<SynchronousChan<M>>.
+
+Each Chan object c has fields
+     c.sendG of type M->Guard<Triv>.
+     c.receiveG of type Void->Guard<M>
+     c.send such that c.send(m) is equivalent to await( c.sendG(m) && skip() )
+     c.receive such that c.receive() is equivalent to await( c.receiveG() >> unit )
