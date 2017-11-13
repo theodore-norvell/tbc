@@ -101,11 +101,15 @@
      * It is a precondition that f should not call its argument. **/
     public static function fix&lt;A&gt;( f : (Void -&gt; Process&lt;A&gt;) -&gt; Process&lt;A&gt; ) {
          var p : Process&lt;A&gt; = null ;
-         function fp() { return p ; }
+         function fp() {
+             if( p==null )
+                 return toss(&quot;TBC Error in fix. Possibly a missing invoke?&quot;) ;
+             else
+                 return p ; }
          p = f( fp ) ;
          return p ;
      }</pre>
-        <p> You can see from the precondition of <code>fix</code> that its argument should not call <em>its</em> argument -- violating this precondition is what the use of <code>invoke( repeat )</code> in place of <code>repeat()</code> avoids. But why the precondition? Let's see what happens if we were to replace <code>invoke( repeat )</code> with <code>repeat()</code> in the definition of <code>f</code> above. Then, when <code>nag</code> is called, <code>nag</code> calls&nbsp;<code>fix</code>, which calls <code>f</code>&nbsp;passing <code>fp</code> as <code>repeat</code>. Then <code>f</code> would call <code>repeat</code> (i.e. <code>fp</code>) which returns the current value of<code> p</code>, which is still <code>null</code>. So <code>null</code> is passed to the &gt;, which is a mistake.</p>
+        <p> You can see from the precondition of <code>fix</code> that its argument should not call <em>its</em> argument -- violating this precondition is what the use of <code>invoke( repeat )</code> in place of <code>repeat()</code> avoids. But why the precondition? Let's see what happens if we were to replace <code>invoke( repeat )</code> with <code>repeat()</code> in the definition of <code>f</code> above. Then, when <code>nag</code> is called, <code>nag</code> calls&nbsp;<code>fix</code>, which calls <code>f</code>&nbsp;passing <code>fp</code> as <code>repeat</code>. Then <code>f</code> would call <code>repeat</code> (i.e. <code>fp</code>); normally this would return <code>p</code>, but, if <code>p</code> is not yet initialized, this would be bad.</p>
 <p>When we repect the precondition by using <code>invoke(repeat)</code>, what happens is this : When <code>nag</code> is called, <code>nag</code> calls&nbsp;<code>fix</code>, which calls <code>f</code>&nbsp;passing <code>fp</code> as <code>repeat</code>, exactly as before. Then <code>f</code> calls <code>invoke(repeat)</code>, which returns a process that, when run, will call  <code>repeat</code> (i.e. <code>fp</code>); However this process &#8212;the one returned from <code>invoke(repeat)</code>&#8212; is only run later, after <code>fix</code> has returned and variable <code>p</code> has been assigned. Thus <code>repeat</code> returns the then current value of<code> p</code>, which is the same as the process returned from <code>fix</code>, and then that process is run. It is crucial here that the function <code>fp</code> and the variable <code>p</code> live longer than the invocation of <code>fix</code> that created them.</p>
         <p>The haxe code is <a href="Controller.hx">here</a>.</p>
         <div id="haxe:trace"></div>
