@@ -31,7 +31,7 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
         var p = exec( function(){throw "bam!";} ) ;
         var result = "String" ;
         p.go( function( v: Void ){ result = "normal"; },
-        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
         assertEquals( "abnormal bam!", result ) ;
     }
 
@@ -39,7 +39,7 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
         var p = toss( "boom!") ;
         var result = "String" ;
         p.go( function( v: Void ){ result = "normal"; },
-        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
         assertEquals( "abnormal boom!", result ) ;
     }
 
@@ -59,13 +59,49 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
         assertEquals( "abnormal boom!", result ) ;
     }
 
+    public function testMap0() {
+        function square( x : Int ){ return x*x ; } ;
+        var p = unit(13).map( square ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "normal 169", result ) ;
+    }
+
+    public function testMap1() {
+        function oops( x : Int ){ throw "oops" ; return x*x ; } ;
+        var p = unit(13).map( oops ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal"; },
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal oops", result ) ;
+    }
+
+    public function testMap2() {
+        function square( x : Int ) return x*x ;
+        var p = toss("oops").map( square ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal"; },
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal oops", result ) ;
+    }
+
+    public function testMap3() {
+        function square( x : Int ) return "hello" ;
+        var p = toss("oops").map( square ) ;
+        var result = "String" ;
+        p.go( function( v: String ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal oops", result ) ;
+    }
+
     public function testPar0() {
         var p0 : Process<Int> = unit(42) ;
         var p1 : Process<Int> = toss( "boom!" ) ;
         var p = par( p0, p1 ) ;
         var result = "String" ;
         p.go( function( v: Pair<Int,Int> ){ result = "normal"; },
-        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
         assertEquals( "abnormal boom!", result ) ;
     }
 
@@ -75,7 +111,7 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
         var p = par( p1, p0 ) ;
         var result = "String" ;
         p.go( function( v: Pair<Int,Int> ){ result = "normal"; },
-        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
         assertEquals( "abnormal boom!", result ) ;
     }
 
@@ -93,7 +129,7 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
         var p =  attempt( toss("boom!"), rec ).sc( unit(42) ) ;
         var result = "String" ;
         p.go( function( v: Int ){ result = "normal "+v; },
-        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
         assertEquals( "normal 42", result ) ;
     }
 
@@ -102,7 +138,7 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
         var p =  attempt( unit(7), rec ).sc( toss("boom!") ) ;
         var result = "String" ;
         p.go( function( v: Int ){ result = "normal "+v; },
-        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
         assertEquals( "abnormal boom!", result ) ;
     }
 
@@ -112,11 +148,15 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
         var p : Process<Int> =  attempt( toss("zip"), rec ) ;
         var result = "String" ;
         p.go( function( v: Int ){ result = "normal "+v; },
-        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+              function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
         assertEquals( "abnormal zip zap", result ) ;
     }
 
     public function testTimer0() {
+        // This is a bit ugly.  This method
+        // should return, but before doing so,
+        // it should schedule a testrunner to be
+        // run in the future.
         var p = pause(10) > toss("oops") ;
         p.go( function( v: Int ){
                   var r = new haxe.unit.TestRunner();
@@ -130,6 +170,10 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
     }
 
     public function testTimer1() {
+        // This is a bit ugly.  This method
+        // should return, but before doing so,
+        // it should schedule a testrunner to be
+        // run in the future.
         var p = pause(10) > unit(53) ;
         p.go( function( v: Int ){
             var r = new haxe.unit.TestRunner();

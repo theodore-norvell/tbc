@@ -10,6 +10,12 @@ interface ProcessI<A> {
     public function bind<B>( f : A -> Process<B> ) : Process<B> ;
 
     /** Returns a process that executes by
+    * first executing this process to get a values x:A
+    * and running that result through the function.
+    **/
+    public function map<B>( f : A -> B ) : Process<B> ;
+
+    /** Returns a process that executes by
     * first executing this process and
      * then executing b.
     **/
@@ -34,6 +40,11 @@ abstract Process<A>( ProcessI<A> ) to ProcessI<A> from ProcessI<A> {
         return new Process<B>( (this:ProcessI<A>).bind( (f:A ->ProcessI<B>) ) ) ;
     }
 
+    /** See ProcessI.map */
+    public inline function map<B>( f : A -> B ) : Process<B> {
+        return new Process<B>( (this:ProcessI<A>).map( f ) ) ;
+    }
+
     /** See ProcessI.sc */
     @:op( A > B )
     public inline function sc<B>( q : Process<B> ) : Process<B> {
@@ -55,6 +66,14 @@ class ProcessA<A> implements ProcessI<A> {
     /** See ProcessI.bind */
     public function bind<B>( f : A -> Process<B> ) : Process<B> {
         return new ThenP( this, f ) ;
+    }
+
+    /** See ProcessI.map */
+    public function map<B>( f : A -> B ) : Process<B> {
+        var f1 = function(a:A){ return
+                      new ExecP<B>( function() { return
+                                        f(a) ; } ) ; }
+        return new ThenP( this, f1 ) ;
     }
 
     /** See ProcessI.sc */
@@ -401,7 +420,8 @@ class AltP<A> extends ProcessA<A> {
 
     public override function go( k : A -> Void, h : Dynamic -> Void ) {
         _e.go( function( b : Bool ) {
-                if( b ) { _p.go( k, h ) ; } else { _q.go( k, h ) ; } },
+                   if( b ) { _p.go( k, h ) ; }
+                   else { _q.go( k, h ) ; } },
                h) ; }
 }
 
