@@ -120,21 +120,29 @@ private class TossP<A> extends ProcessA<A> {
         h( _ex ) ; }
 }
 
-/** A process that attempts to run p and recovers by running m(ex). */
+/** See documentation under TBC.attempt and TBC.ultimately */
 private class AttemptP<A> extends ProcessA<A> {
     var _p : Process<A> ;
     var _f : Dynamic -> Process<A> ;
+    var _q : Process<Triv> ;
 
-    public function new( p : Process<A>, f : Dynamic -> Process<A> ) {
-        _p = p ; _f = f ; }
+    public function new( p : Process<A>, f : Dynamic -> Process<A>, q : Process<Triv> ) {
+        _p = p ; _f = f ; _q = q ; }
 
     public override function go( k : A -> Void, h : Dynamic -> Void ) : Void {
-        _p.go( k,
-               function( ex : Dynamic){ _f(ex).go( k, h) ; }
+        _p.go( function(a:A) {
+                   _q.go(function(t:Triv){ k(a) ; }, h) ; },
+               function( ex : Dynamic) {
+                   _f(ex).go(
+                       function( a : A ) {
+                           _q.go(function(t:Triv){ k(a) ; }, h) ; },
+                       function( ex1 : Dynamic ) {
+                           _q.go(function(t:Triv){ h(ex1) ; },
+                                 function(ex2:Dynamic){ h(new Pair<Dynamic,Dynamic>(ex1,ex2)) ; } ) ; }
+                   ) ; }
         ) ;
     }
 }
-
 /** Guards return a Disabler when enabled.
 *    The Disabler is used to disable the guard.
 **/
@@ -289,7 +297,7 @@ to GuardedProcessI<A> from GuardedProcessI<A> {
     }
 }
 
-/** An "abstract class" for guarded processes. 
+/** An "abstract class" for guarded processes.
 * "Concrete guarded process classes will extend off this class while
 * overriding the enable method.
 **/
@@ -463,7 +471,7 @@ enum Triv { } // The only value is null .
 *
 **/
 class Pair<A,B> {
-    public function new( ) { }
+    public function new( ?a:A, ?b:B) { _left = a ; _right = b ; }
     public var _left:A ;
     public var _right:B ; }
 
@@ -517,10 +525,59 @@ class TBC {
         return new TossP<A>(ex) ;
     }
 
-    /** Catch an exception.
+    /** A process that attempts to run p and recovers by running f(ex); in any case q is run finally.
+    *  <p> The last argument can be omitted. To run process attempt(p, f): First p is run.
+    *  <ul>
+    *      <li> If p succeeds with a,
+    *           then attempt(p, f) succeeds with a.
+    *      <li> If p fails with ex, and f(ex) succeeds with a,
+    *           then attempt(p, f) succeeds with a.
+    *      <li> If p fails with ex, and f(ex) fails with ex1,
+    *           then attempt(p, f) fails with ex1.
+    *  </ul>
+    *
+    *  <p> To run process attempt(p, f, q): First p is run.
+    *  <ul>
+    *      <li> If p succeeds with a and q succeeds,
+    *           then attempt(p, f, q) succeeds with a.
+    *      <li> If p succeeds and q fails with ex2,
+    *           then attempt(p, f, q) fails with ex2.
+    *      <li> If p fails with ex, and f(ex) succeeds with a, and q succeeds,
+    *           then attempt(p, f, q) succeeds with a.
+    *      <li> If p fails with ex, and f(ex) succeeds with a, and q fails with ex1,
+    *           then attempt(p, f, q) fails with ex1.
+    *      <li> If p fails with ex, and f(ex) fails with ex1, and q succeeds,
+    *           then attempt(p, f, q) fails with ex1.
+    *      <li> If p fails with ex, and f(ex) fails with ex1, and q fails with ex2,
+    *           then attempt(p, f, q) fails with a Pair consisting of ex1 on the left and ex2 on the right.
+    *  </ul>
+    *  <p>
+    *  See also TBC.ultimately for a version that allows the exception
+    *  handing to be omitted.
     **/
-    public static function attempt<A>( p : Process<A>, f : Dynamic -> Process<A> ) : Process<A> {
-        return new AttemptP(p, f) ;
+    public static function attempt<A>( p : Process<A>,
+                                       f : Dynamic -> Process<A>,
+                                       ?q : Process<Triv> ) : Process<A> {
+        if( q==null ) q = skip() ;
+        return new AttemptP(p, f, q) ;
+    }
+
+    /** Finalize
+    *   ultimately( p, q ) works as follows. p is run:
+    *   <ul>
+    *      <li> If p succeeds with a and q succeeds,
+    *           then ultimately( p, q ) succeeds with a.
+    *      <li> If p succeeds with a and q fails with ex2,
+    *           then ultimately( p, q ) fails with ex2.
+    *      <li> If p fails with ex and q succeeds,
+    *           then ultimately( p, q ) fails with ex.
+    *      <li> If p fails with ex and q fails with ex2,
+    *           then ultimately( p, q ) fails with a Pair consisting of ex on the left and ex2 on the right.
+    *   </ul>
+    **/
+    public static function ultimately<A>( p : Process<A>, q : Process<Triv> ) : Process<A> {
+        var f = function( ex:Dynamic) { return toss(ex) ; } ;
+        return attempt( p, f, q) ;
     }
 
     /** Run the process returned by a function.
@@ -530,10 +587,10 @@ class TBC {
         // This differs from exec(fp) in type. The result of exec(fp)
         // is a Process<Process<A>>.  So `foo > exec(fp)` would not
         // acually run the result of fp when run.
-        // It differs from fp() in the time of the invocation of fp.
-        // For example in `foo > fp()`, fp is called when the > operator
-        // is executed; in `foo > invoke( fp )`, fp is called after foo
-        // has run.
+        // It differs from fp() in the time of the calling of fp.
+        // For example in `foo > fp()`, fp is called when before the > operator
+        // is executed; in `foo > invoke( fp )`, fp is not called; instead `fp` will
+        // be called when process `foo > invoke( fp )` is run.
         //
         // Consdier this example:
         //   static function nag() : Process<Triv>{

@@ -1,5 +1,6 @@
 package ;
 
+import tbc.TBC.Triv ;
 import tbc.TBC.Pair ;
 import tbc.TBC.Process ;
 import tbc.TBC.* ;
@@ -150,6 +151,141 @@ class TestExceptionHandling extends haxe.unit.TestCase  {
         p.go( function( v: Int ){ result = "normal "+v; },
               function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
         assertEquals( "abnormal zip zap", result ) ;
+    }
+
+    public function testUltimatelySS() {
+        var buffer = "" ;
+        var setup = function() : Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var p : Process<Int> =  ultimately( exec(setup), exec(teardown) ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "normal 10", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testUltimatelySF() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) > toss(5) ;
+        var p : Process<Int> =  ultimately( exec(setup), q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal 5", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testUltimatelyFS() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) ;
+        var p : Process<Int> =  ultimately( exec(setup) > toss(9), q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal 9", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testUltimatelyFF() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) > toss(5) ;
+        var p : Process<Int> =  ultimately( exec(setup) > toss(9), q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal { _right => 5, _left => 9 }", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testAttemptSNS() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) ;
+        var f = function(ex : Dynamic) : Process<Int> { return unit( 7 ) ; }
+        var p : Process<Int> =  attempt( exec(setup), f, q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "normal 10", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testAttemptSNF() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) > toss(5);
+        var f = function(ex : Dynamic) : Process<Int> { return unit( 7 ) ; }
+        var p : Process<Int> =  attempt( exec(setup), f, q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal 5", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testAttemptFSS() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) ;
+        var f = function(ex : Dynamic) : Process<Int> { return unit( 7 ) ; }
+        var p : Process<Int> =  attempt( exec(setup) > toss(9), f, q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "normal 7", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testAttemptFSF() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) > toss(5) ;
+        var f = function(ex : Dynamic) : Process<Int> { return unit( 7 ) ; }
+        var p : Process<Int> =  attempt( exec(setup) > toss(9), f, q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal 5", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testAttemptFFS() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) ;
+        var f = function(ex : Dynamic) : Process<Int> { return toss( 7 ) ; }
+        var p : Process<Int> =  attempt( exec(setup) > toss(9), f, q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal 7", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
+    }
+
+    public function testAttemptFFF() {
+        var buffer = "" ;
+        var setup = function() :Int { buffer = buffer + "setup" ; return 10 ;}
+        var teardown = function() { buffer = buffer + " teardown" ; return null ; }
+        var q : Process<Triv> = exec(teardown) > toss(5) ;
+        var f = function(ex : Dynamic) : Process<Int> { return toss( 7 ) ; }
+        var p : Process<Int> =  attempt( exec(setup) > toss(9), f, q ) ;
+        var result = "String" ;
+        p.go( function( v: Int ){ result = "normal "+v; },
+        function( ex : Dynamic ){ result = "abnormal " + ex; } ) ;
+        assertEquals( "abnormal { _right => 5, _left => 7 }", result ) ;
+        assertEquals( "setup teardown", buffer ) ;
     }
 
     public function testTimer0() {
