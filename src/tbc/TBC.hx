@@ -258,8 +258,10 @@ interface GuardedProcessI<A> {
     **/
     public function orElse( gp : GuardedProcessI<A> ) : GuardedProcessI<A> ;
 
+    // Is the guarded process ready to execute now? If so it returns a result
+    public function take() : Null<A> ;
 
-/** Enable the guarded process.
+    /** Enable the guarded process.
     * If an enabled guarded process fires, it executes the first routine first,
     * then it executes itself, finally it calls k with the result.
     **/
@@ -526,7 +528,8 @@ class TBC {
     }
 
     /** A process that attempts to run p and recovers by running f(ex); in any case q is run finally.
-    *  <p> The last argument can be omitted. To run process attempt(p, f): First p is run.
+    *  <p> The last argument can be omitted.
+    *  <p> To run process attempt(p, f): First p is run.
     *  <ul>
     *      <li> If p succeeds with a,
     *           then attempt(p, f) succeeds with a.
@@ -544,8 +547,8 @@ class TBC {
     *           then attempt(p, f, q) fails with ex2.
     *      <li> If p fails with ex, and f(ex) succeeds with a, and q succeeds,
     *           then attempt(p, f, q) succeeds with a.
-    *      <li> If p fails with ex, and f(ex) succeeds with a, and q fails with ex1,
-    *           then attempt(p, f, q) fails with ex1.
+    *      <li> If p fails with ex, and f(ex) succeeds with a, and q fails with ex2,
+    *           then attempt(p, f, q) fails with ex2.
     *      <li> If p fails with ex, and f(ex) fails with ex1, and q succeeds,
     *           then attempt(p, f, q) fails with ex1.
     *      <li> If p fails with ex, and f(ex) fails with ex1, and q fails with ex2,
