@@ -13,8 +13,8 @@ import js.Browser ;
 import js.html.KeyboardEvent ;
 
 /** This module requires Andy Li's JQuery extern library */
-import jQuery.JQuery ;
-import jQuery.Event ;
+import js.jquery.JQuery ;
+import js.jquery.Event ;
 
 
 class Controller {
@@ -52,7 +52,9 @@ class Controller {
                     downKey(body) >> preventDefault > exec( smaller )
                 )
             ) ;
-        p.go( function(x:Triv) {} ) ; // Execute p
+        // Execute p
+        p.go( function(x:Triv) {},
+              function( ex : Dynamic ) trace( "Exception " + ex ) ) ;
     }
 
     static function whichIs( k : Int ) {

@@ -258,9 +258,6 @@ interface GuardedProcessI<A> {
     **/
     public function orElse( gp : GuardedProcessI<A> ) : GuardedProcessI<A> ;
 
-    // Is the guarded process ready to execute now? If so it returns a result
-    public function take() : Null<A> ;
-
     /** Enable the guarded process.
     * If an enabled guarded process fires, it executes the first routine first,
     * then it executes itself, finally it calls k with the result.

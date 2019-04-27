@@ -26,10 +26,8 @@ class Controller {
     static var b1b : Element ;
     static var b2 : Element ;
 
-    static function out(str : String) { return
-        exec( function() {
-            outbox.innerHTML = str ;
-            return null ; }) ;
+    static function out(str : String) : Process<Triv> { return
+        exec( () -> { outbox.innerHTML = str ; null ; }) ;
     }
     static function nagTheUser(  ) {
         return out( "hurry up" ) > pause(500) > out("") ; }
