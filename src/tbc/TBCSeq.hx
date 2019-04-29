@@ -2,13 +2,6 @@ package tbc;
 
 import haxe.macro.Context ;
 import haxe.macro.Expr ;
-//import Date ;
-
-class MFE {
-    public macro static function foo( name : String, t : ComplexType ) {
-        var e : Expr = macro function( $name ) { return 0 ; }  ;
-        return e ; }
-}
 
 private typedef Item = {
     var pos : Position ;
@@ -38,6 +31,11 @@ class TBCSeq {
      *     seq( e, e1, e2, ..., en)
      *              ---->  e.sc( seq( e1, e2, ..., en ) )
      * </pre>
+     * 
+     * TODO: Support final.  Currently Haxe 4 users can write final instead
+     * of var, but the macro treats it the same as "var".  This is for
+     * compatiblilty with Haxe 4 and becuase I Haxe 4 seems to lack final
+     * parameters.
      */
     public macro static function seq( e : Expr, es : Array<Expr> ) {
 

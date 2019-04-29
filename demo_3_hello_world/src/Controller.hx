@@ -1,6 +1,7 @@
 package ;
 import js.html.KeyboardEvent;
 import haxe.Log ;
+import haxe.CallStack ;
 import tbc.TBC.Process ;
 import tbc.TBC.Guard ;
 import tbc.TBC.Triv ;
@@ -16,41 +17,48 @@ import js.html.InputElement ;
 
 class Controller {
 
-
     static var nameBox : InputElement ;
     static var question : Element ;
     static var reply : Element ;
 
-    static public function main() { 
-        var win = Browser.window ;
-        var doc = win.document ;
-        var body = doc.body ;
+
+    static public function main() {
+        var body = Browser.window.document.body ;
         body.onload = Controller.onload ; 
     }
 
-    static function show( el : Element ) : Process<Triv> { return
-        exec( function() : Triv {
-                el.style.visibility = "visible" ; return null ; } ) ;
-    }
+    static function show( el : Element ) : Process<Triv> { return 
+        exec( () -> {el.style.visibility = "visible"; null;} ) ; }
 
-    static function hide( el : Element ) : Process<Triv> { return
-        exec( function()  : Triv {
-                el.style.visibility = "hidden";  return null ; } ) ;
-    }
+    static function hide( el : Element ) : Process<Triv> { return 
+        exec( () -> {el.style.visibility = "hidden"; null;} ) ; }
 
-    static function getValue( el : InputElement ) : Process<String> { return
-        exec( function()  : String {
-            return el.value ; } ) ;
-    }
+    static function getValue( el : InputElement ) : Process<String> { return 
+        exec( () -> el.value ) ; }
 
-    static function clearText( el : InputElement ) : Process<Triv> { return
-        exec( function()  : Triv {
-            el.value = "" ; return null ; } ) ;
-    }
+    static function clearText( el : InputElement ) : Process<Triv> { return 
+        exec( () -> {el.value = ""; null;}  ) ; }
 
-    static function putText( el : Element, str : String  ) : Process<Triv> { return
-        exec( function()  : Triv {
-            el.textContent = str ; return null ; } ) ;
+    static function putText( el : Element, str : String ) : Process<Triv> { return 
+        exec( () -> {el.textContent = str; null;} ) ; }
+
+    static function mainLoop() : Process<Triv> { return 
+            loop  (
+                clearText( nameBox ) >
+                show( nameBox )  >
+                show( question ) >
+                getAndDisplayAnswer() >
+                hide( question ) >
+                hide( nameBox ) >
+                pause( 1000 )
+            ) ; }
+
+    static function getAndDisplayAnswer() : Process<Triv> { return 
+            await( enter( nameBox ) && getValue( nameBox ) ) >= (name:String) ->
+            hello(name) ; }
+            
+    static private function printStack() : Void {
+        trace( CallStack.toString( CallStack.exceptionStack() ) ) ;
     }
 
     static public function onload() {
@@ -62,33 +70,21 @@ class Controller {
 
         Log.trace("Last compiled " + CompileTime.get() );
         Log.trace("Started at " + Date.now() );
-        var p =
-            loop  (
-                clearText( nameBox ) >
-                show( nameBox )  >
-                show( question ) >
-                getAndDisplayAnswer() >
-                hide( question ) >
-                hide( nameBox ) >
-                pause( 1000 )
-            ) ;
-        p.go( function(x:Triv) {},
-              function( ex : Dynamic ) trace( "Exception " + ex ) ) ; // Execute p
+        
+        mainLoop().go( function(x:Triv) {},
+                       function( ex : Dynamic ) {
+                           trace( "Exception " + ex ) ;
+                           printStack() ; }
+                     ) ;
     }
 
-    static function getAndDisplayAnswer( ) : Process<Triv>{
-        return
-            await( enter( nameBox ) && getValue( nameBox ) ) >=
-            hello ;
-    }
-
-    static function hello( name : String ) { return
+    static function hello( name : String ) : Process<Triv> { return
         putText( reply, "Hello "+name ) ; }
 
     static function enter( el : Element ) : Guard<Event> {
         function isEnterKey( ev : Event ) : Bool {
             var kev = cast(ev, KeyboardEvent) ;
-            return kev.keyCode == 13 || kev.which == 13 ; }
+            return kev.code == "Enter" ; }
         return keypress( nameBox ) & isEnterKey ;
     }
 
@@ -103,9 +99,8 @@ class Controller {
         return fix( f ) ;
     }
 
-    static function flash( el : Element ) : Process<Triv> { return
+    static final flash = ( el : Element ) ->
         hide(el) > pause(100) > show(el) > pause(100) >
         hide(el) > pause(100) > show(el) ;
-    }
 
 }

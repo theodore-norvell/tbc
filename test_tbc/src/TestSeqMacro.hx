@@ -10,7 +10,7 @@ class TestSeqMacro extends haxe.unit.TestCase  {
         var p : Process<Int> 
         = seq(
             (var y : Int = unit(4)),
-            (var x = unit(3)),
+            (final x = unit(3)),
             unit(x+y)
         ) ;
         var result : String ;
