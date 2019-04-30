@@ -1,6 +1,9 @@
 package tbc;
 
+import haxe.ds.Vector ;
+
 /** An interface representing processes computing values of type A */
+@:expose
 interface ProcessI<A> {
 
     /** Returns a process that executes by
@@ -28,6 +31,7 @@ interface ProcessI<A> {
 /** A type representing processes computing values of type A.
 *   This abstract type adds operators > and >= to interface ProcessI<A>.
 **/
+@:expose
 abstract Process<A>( ProcessI<A> ) to ProcessI<A> from ProcessI<A> {
 
     public inline function new(p : ProcessI<A>) {
@@ -61,6 +65,7 @@ abstract Process<A>( ProcessI<A> ) to ProcessI<A> from ProcessI<A> {
 *    New Process types will generally extend this class
 *    while overriding the .go method.
 **/
+@:expose
 class ProcessA<A> implements ProcessI<A> {
 
     /** See ProcessI.bind */
@@ -146,6 +151,7 @@ private class AttemptP<A> extends ProcessA<A> {
 /** Guards return a Disabler when enabled.
 *    The Disabler is used to disable the guard.
 **/
+@:expose
 interface Disabler {
     public function disable() : Void ;
 }
@@ -153,6 +159,7 @@ interface Disabler {
 /** An interface for Guards.
 *
 **/
+@:expose
 interface GuardI<E> {
     /** Enable the guard.
     * When fired, the guard will execute k. **/
@@ -169,6 +176,7 @@ interface GuardI<E> {
 * operator overloads >> and && and & .
 *
 **/
+@:expose
 abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
 
     public inline function new(g : GuardI<E>) {
@@ -204,6 +212,7 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
 * Guard types generally extend this class while overriding
 * .enable.
 **/
+@:expose
 class GuardA<E> implements GuardI<E> {
     public function enable( k : E -> Void, h : Dynamic -> Void ) : Disabler {
         h("Method enable not overridden in " + this) ; return null ; }
@@ -218,6 +227,7 @@ class GuardA<E> implements GuardI<E> {
         return new FliteredGuard<E>( this, c ) ; }
 }
 
+@:expose
 class FliteredGuard<E> extends GuardA<E> {
     var _guard : Guard<E> ;
     var _filter : E -> Bool ;
@@ -241,6 +251,7 @@ class FliteredGuard<E> extends GuardA<E> {
 /** Interface for guarded processes.
 *
 **/
+@:expose
 interface GuardedProcessI<A> {
     /** Returns a process that executes by
     * first executing this process to get a values x:A
@@ -266,6 +277,7 @@ interface GuardedProcessI<A> {
 
 }
 
+@:expose
 abstract GuardedProcess<A>( GuardedProcessI<A> )
 to GuardedProcessI<A> from GuardedProcessI<A> {
 
@@ -300,6 +312,7 @@ to GuardedProcessI<A> from GuardedProcessI<A> {
 * "Concrete guarded process classes will extend off this class while
 * overriding the enable method.
 **/
+@:expose
 class GuardedProcessA<A> implements GuardedProcessI<A>{
     /** Returns a process that executes by
     * first executing this process to get a values x:A
@@ -399,7 +412,7 @@ private class ChoiceDisabler<A> implements Disabler {
 * As soon as one fires, all are disabled. Then the GuardedProcess
 * that fired executes.
 **/
-class AwaitP<A> extends ProcessA<A> {
+private class AwaitP<A> extends ProcessA<A> {
     var _gp : GuardedProcess<A> ;
 
     public function new( gp : GuardedProcess<A>  ) {
@@ -417,7 +430,7 @@ class AwaitP<A> extends ProcessA<A> {
 /** A process representing alternation.
 *
 **/
-class AltP<A> extends ProcessA<A> {
+private class AltP<A> extends ProcessA<A> {
     var _e : Process<Bool> ;
     var _p : Process<A> ;
     var _q : Process<A> ;
@@ -436,7 +449,7 @@ class AltP<A> extends ProcessA<A> {
 /** A process made from two process that execute in an interleaved fashion.
 *
 **/
-class Par2P<A,B> extends ProcessA<Pair<A,B>> {
+private class Par2P<A,B> extends ProcessA<Pair<A,B>> {
     var _p : Process<A> ;
     var _q : Process<B> ;
 
@@ -459,16 +472,39 @@ class Par2P<A,B> extends ProcessA<Pair<A,B>> {
     }
 }
 
+/** A process made from bunch of processes run in parallel.
+**/
+private class ParFor<A> extends ProcessA<Vector<A>> {
+    var _n : Int ;
+    var _f : Int->Process<A> ;
+
+    public function new( n : Int, f : Int->Process<A> ) {
+        _n = n ; _f = f ; }
+
+    public override function go( k : Vector<A> -> Void, h : Dynamic -> Void ) {
+        var result = new Vector<A>( _n ) ;
+        var completed = 0 ;
+        for( i in 0 ... _n ) {
+            _f(i).go( function( a : A ) {
+                        result[i] = a ;
+                        completed++ ;
+                        if( completed == _n ) k(result) ; },
+                     h ) ; }
+    }
+}
+
 
 /** A type that has null as its only member.
 *
 **/
+@:expose
 enum Triv { } // The only value is null .
 
 
 /** A pair of values.
 *
 **/
+@:expose
 class Pair<A,B> {
     public function new( ?a:A, ?b:B) { _left = a ; _right = b ; }
     public var _left:A ;
@@ -478,6 +514,7 @@ class Pair<A,B> {
 /** The main TBC class. Exports various usefull static functions.
 *
 **/
+@:expose
 class TBC {
     private function new( ) { } // Do not instantiate.
 
@@ -493,6 +530,10 @@ class TBC {
     public static function par<A,B>( p : Process<A>, q : Process<B> )
     : Process<Pair<A,B>> {
         return new Par2P<A,B>( p, q ) ; }
+
+    public static function parFor<A>( n : Int, f : Int->Process<A> ) 
+    : Process<Vector<A>> {
+        return new ParFor<A>( n, f)  ; }
 
     public static function loop<A>( p : Process<A> ) : Process<Triv> {
         return p.bind( function( a : A ) { return loop(p) ; } ) ; }

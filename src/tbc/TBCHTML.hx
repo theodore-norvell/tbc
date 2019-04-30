@@ -29,6 +29,7 @@ private class ElementDisabler implements Disabler {
 
 
 
+@:expose
 class HTMLEventGuardA extends GuardA<Event> {
     var _el : Element  ;
 
@@ -56,6 +57,7 @@ class HTMLEventGuardA extends GuardA<Event> {
         h("removeHandler is not defined in "+this ) ; }
 }
 
+@:expose
 class ClickG extends HTMLEventGuardA {
 
     public function new( el : Element ) {
@@ -69,6 +71,7 @@ class ClickG extends HTMLEventGuardA {
     }
 }
 
+@:expose
 class SubmitG extends HTMLEventGuardA {
 
     public function new( el : Element ) {
@@ -82,6 +85,7 @@ class SubmitG extends HTMLEventGuardA {
     }
 }
 
+@:expose
 class KeyPressG extends HTMLEventGuardA {
 
     public function new( el : Element ) {
@@ -95,6 +99,7 @@ class KeyPressG extends HTMLEventGuardA {
     }
 }
 
+@:expose
 class ChangeG extends HTMLEventGuardA {
 
     public function new( el : Element ) {
@@ -109,6 +114,7 @@ class ChangeG extends HTMLEventGuardA {
 }
 
 
+@:expose
 class TBCHTML {
     public static function click( el : Element ) : Guard<Event>{
         return new ClickG( el ) ; }

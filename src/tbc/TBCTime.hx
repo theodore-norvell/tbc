@@ -19,6 +19,7 @@ private class MyTimer implements Disabler {
     }
 }
 
+@:expose
 class TimeOutGuard extends GuardA<Triv> {
     var _timeInMiliSecs : Int ;
 
@@ -31,6 +32,7 @@ class TimeOutGuard extends GuardA<Triv> {
     }
 }
 
+@:expose
 class TBCTime {
     static public function pause( delayInMiliSecs : Int ) 
         : Process<Triv> {
@@ -45,4 +47,3 @@ class TBCTime {
         return new TimeOutGuard( delayInMiliSecs ) ;
     }
 }
-

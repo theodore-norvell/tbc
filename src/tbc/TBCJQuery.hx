@@ -29,6 +29,7 @@ private class JQueryDisabler implements Disabler {
     }
 }
 
+@:expose
 class JQueryG extends GuardA<Event> {
     var _elements : JQuery  ;
     var _eventName : String ;
@@ -45,6 +46,7 @@ class JQueryG extends GuardA<Event> {
 }
 
 
+@:expose
 class TBCJQuery {
     public static function jqEvent( elements : JQuery,
                                     eventName : String )

@@ -1,44 +1,14 @@
 -cp src
 
---each 
+tbc.TBC 
 
--cp demo_0_blog/src
--main Controller
-
--js demo_0_blog/bin/controller.js
-
---next
-
--cp demo_1_pauses/src
--main Controller
-
--js demo_1_pauses/bin/controller.js
+--each
+tbc.TBCTime
+-js bin/tbc4Node.js
 
 --next
-
--cp demo_2_parallel/src
--main Controller
-
--js demo_2_parallel/bin/controller.js
-
---next
-
--cp demo_3_hello_world/src
--main Controller
-
--js demo_3_hello_world/bin/controller.js
-
---next
-
--cp demo_4_jquery/src
 -lib jQueryExtern
--main Controller
-
--js demo_4_jquery/bin/controller.js
-
---next
-
--cp demo_5_try_the_tm/src
--main Controller
-
--js demo_5_try_the_tm/bin/controller.js
+tbc.TBCTime
+tbc.TBCHTML
+tbc.TBCJQuery
+-js bin/tbc4JQ.js
