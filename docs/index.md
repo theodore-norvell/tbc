@@ -1,14 +1,15 @@
 # tbc
-Take Back Control. Event-driven programming without inversion of control. Especially for GUIs and web-development.
+Take Back Control. Event-driven programming without inversion of control.
 
-This is a process-algebra-inspired and monadic approach to event driven programming. The idea is to replace ad-hoc approaches
+This is a process-algebra-inspired and monadic approach to event driven programming and parallel programming.
+
+The idea is to replace ad-hoc approaches
 and state-based approaches with an approach that is more like good old sequential (and parallel) programming. It can be used 
 for designing the control aspect of graphical user interfaces and asynchronous communication with a server.
 
-The implementation is in Haxe, but the intention is to export a library that can be used directly from JavaScript and perhaps
-other languages.
+The implementation is in [Haxe](https://haxe.org/), but the library can also be used from JavaScript, TypeScript, and some of Haxe's other target language.
 
-More info can be found in my blog post at <http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html>.
+More information can be found in my blog post at <http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html>.
 
 Demo is at [here](frontpage/index.html)
 
