@@ -1,7 +1,6 @@
 package ;
 import js.html.KeyboardEvent;
 import haxe.Log ;
-import haxe.CallStack ;
 import tbc.TBC.Process ;
 import tbc.TBC.Guard ;
 import tbc.TBC.Triv ;
@@ -56,10 +55,6 @@ class Controller {
     static function getAndDisplayAnswer() : Process<Triv> { return 
             await( enter( nameBox ) && getValue( nameBox ) ) >= (name:String) ->
             hello(name) ; }
-            
-    static private function printStack() : Void {
-        trace( CallStack.toString( CallStack.exceptionStack() ) ) ;
-    }
 
     static public function onload() {
         var win = Browser.window ;
@@ -71,11 +66,7 @@ class Controller {
         Log.trace("Last compiled " + CompileTime.get() );
         Log.trace("Started at " + Date.now() );
         
-        mainLoop().go( function(x:Triv) {},
-                       function( ex : Dynamic ) {
-                           trace( "Exception " + ex ) ;
-                           printStack() ; }
-                     ) ;
+        mainLoop().run() ;
     }
 
     static function hello( name : String ) : Process<Triv> { return

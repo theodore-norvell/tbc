@@ -7,6 +7,10 @@ tbc.TBCTime
 -js bin/tbc4Node.js
 
 --next
+tbc.TBCTime
+-python pyBin/tbc.py
+
+--next
 -lib jQueryExtern
 tbc.TBCTime
 tbc.TBCHTML

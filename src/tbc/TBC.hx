@@ -1,6 +1,7 @@
 package tbc;
 
 import haxe.ds.Vector ;
+import haxe.CallStack ;
 
 /** An interface representing processes computing values of type A */
 @:expose
@@ -24,8 +25,11 @@ interface ProcessI<A> {
     **/
     public function sc<B>( b : Process<B> ) : Process<B> ;
 
-    /** Run or execute the process. */
+    /** Run the process. */
     public function go(  k : A -> Void, h : Dynamic -> Void ) : Void ;
+
+    /** Run the process. Results are ignored, exceptions are printed. */
+    public function run( ) : Void ;
 }
 
 /** A type representing processes computing values of type A.
@@ -58,6 +62,10 @@ abstract Process<A>( ProcessI<A> ) to ProcessI<A> from ProcessI<A> {
     /** See ProcessI.go */
     public inline function go( k : A -> Void, h : Dynamic -> Void ) {
         (this:ProcessI<A>).go(k, h) ; }
+
+    /** See ProcessI.run */
+    public function run( ) : Void {
+        (this:ProcessI<A>).run() ; }
 }
 
 /** An "abstract class" for processes.
@@ -84,6 +92,20 @@ class ProcessA<A> implements ProcessI<A> {
     /** See ProcessI.sc */
     public function sc<B>( q : Process<B> ) : Process<B> {
         return new ThenP( this, function(a:A) { return q; } ) ;
+    }
+
+    static private function printStack() : Void {
+        trace( CallStack.toString( CallStack.exceptionStack() ) ) ;
+    }
+
+    /** Run the process. Results are ignored, exceptions are printed. */
+    public function run( ) : Void {
+        go( (a:A) -> {}, 
+            (ex:Dynamic)-> {
+                trace( "Process throws uncaught exception " + ex ) ;
+                trace( CallStack.toString( CallStack.exceptionStack() ) ) ;
+            } ) ;
+              
     }
 
     /** See ProcessI.go */
@@ -622,7 +644,7 @@ class TBC {
     }
 
     /** Run the process returned by a function.
-    *
+    *     invoke(fp) is equivalent to exec(fp).bind(id).
     **/
     public static function invoke<A>( fp : Void -> Process<A> ) : Process<A> {
         // This differs from exec(fp) in type. The result of exec(fp)
