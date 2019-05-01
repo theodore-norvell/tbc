@@ -15,3 +15,5 @@ Demo is at [here](frontpage/index.html)
 My NECEC 2015 paper called "Making GUIs less messy: a preliminary report on the Take Back Control library"
 is at <http://www.engr.mun.ca/~theo/Publications/NECEC15-Norvell.pdf>.
 And the presentation slides are at <http://www.engr.mun.ca/~theo/Publications/TBC-NECEC-2015-slides.pdf> .
+
+I gave a long talk on TBC to (NDEV)[https://www.meetup.com/NDevMeetup/]. The (slides can be found here)[http://www.engr.mun.ca/~theo/Publications/Talk-for-NDev-on-TBC.pdf].
