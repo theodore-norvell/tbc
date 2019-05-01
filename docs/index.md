@@ -11,7 +11,9 @@ The implementation is in [Haxe](https://haxe.org/), but the library can also be 
 
 More information can be found in my blog post at <http://sourcephile.blogspot.ca/2015/05/take-back-control-guis-and-other-event.html>.
 
-Demo is at [here](frontpage/index.html)
+The source code is [here at github](https://github.com/theodore-norvell/tbc).
+
+Some demonstration pages are [here](frontpage/index.html).
 
 My NECEC 2015 paper called "Making GUIs less messy: a preliminary report on the Take Back Control library"
 is at <http://www.engr.mun.ca/~theo/Publications/NECEC15-Norvell.pdf>.
