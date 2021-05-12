@@ -1,0 +1,10 @@
+-cp src
+
+--each 
+
+-cp test_tbc/src
+-lib hx3compat
+-main AllTests
+-neko test_tbc/bin/AllTests.n
+
+-cmd neko test_tbc/bin/AllTests.n

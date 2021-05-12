@@ -2,13 +2,6 @@ package tbc;
 
 import haxe.macro.Context ;
 import haxe.macro.Expr ;
-import Date ;
-
-class MFE {
-    public macro static function foo( name : String, t : ComplexType ) {
-        var e : Expr = macro function( $name ) { return 0 ; }  ;
-        return e ; }
-}
 
 private typedef Item = {
     var pos : Position ;
@@ -19,16 +12,38 @@ private typedef Item = {
 
 class TBCSeq {
 
+    /**seq macro
+     * There must be at least one argument.
+     * All arguments must be expressions.
+     * Note that variable declarations are considered expressions
+     * in Haxe, but they must be eclosed in paranetheses for the
+     * parser to allow them as argumnets to a macro.
+     * Each expression is either a (parenthesized)
+     * variable declaration or not.
+     * The last expression must not be a variable declaration.  The translation
+     * is as follows
+     * <pre>
+     *     seq(e)   ---->   e
+     *     seq( (var v : T = e), e1, e2, ..., en)
+     *              ---->  e.bind( v:T --> seq( e1, e2, ..., en ) )
+     *     seq( (var v = e), e1, e2, ..., en)
+     *              ---->  e.bind( v --> seq( e1, e2, ..., en ) )
+     *     seq( e, e1, e2, ..., en)
+     *              ---->  e.sc( seq( e1, e2, ..., en ) )
+     * </pre>
+     * 
+     * TODO: Support final.  Currently Haxe 4 users can write final instead
+     * of var, but the macro treats it the same as "var".  This is for
+     * compatiblilty with Haxe 4 and becuase I Haxe 4 seems to lack final
+     * parameters.
+     */
     public macro static function seq( e : Expr, es : Array<Expr> ) {
-//        var name = "abc" ;
-//        var path = {name: "Int", pack: new Array<String>(), params:null, sub:null} ;
-//        var type : ComplexType = TPath( path ) ;
-//        var e : Expr = macro function( $name : $type ) { return 0 ; }  ;
-//        return e ;
 
-        var date = Date.now().toString();
-        trace(date) ;
+        //var date = Date.now().toString();
+        //trace(date) ;
         es.insert(0, e) ;
+
+        // Make a list of items.
         var a = new Array<Item>() ;
         for( e in es ) {
             var pos : Position = e.pos ;
@@ -55,32 +70,35 @@ class TBCSeq {
                 }
             }
         }
-        for( i in a ) {
-            trace( i.variableName, i.variableType, i.pos, i.expr) ;
-        }
+        // for( i in a ) {
+        //     trace( i.variableName, i.variableType, i.pos, i.expr) ;
+        // }
         var i = a.length -1 ;
         if( a[i].variableName != null ) {
             Context.error( "Last argument of the seq macro must not be a variable declaration",
                 a[i].pos ) ; }
+
+        // Now work backward through the list of items, generating
+        // a result expression.
         var result : Expr = a[i].expr ;
         i = i-1 ;
         while( i >= 0 ) {
             if( a[i].variableName != null) {
                 var pname = a[i].variableName ;
                 if( a[i].variableType == null ) {
-                    trace("Generating call to bind ") ;
+                    // trace("Generating call to bind ") ;
                     result = macro ( (${a[i].expr}).bind(
                         function( $pname ) {
                             return ${result} ; } ) ) ;
                 } else {
-                    trace("Generating call to bind with type") ;
+                    // trace("Generating call to bind with type") ;
                     var ptype = a[i].variableType ;
                     result = macro ( (${a[i].expr}).bind(
                         function( $pname : $ptype ) {
                             return ${result} ; } ) ) ;
                 }
             } else {
-                trace("Generating call to sc") ;
+                // trace("Generating call to sc") ;
                 result = macro (${a[i].expr}).sc(
                     ${result} ) ;
             }

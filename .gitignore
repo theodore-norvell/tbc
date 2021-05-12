@@ -1,19 +1,5 @@
 
-main.js
-
-.idea/.name
-
-*.xml
-
-out/production/tbc/Controller.hx
-
-out/production/tbc/Main.hx
-
-out/production/tbc/tbc/TBC.hx
-
-out/production/tbc/tbc/TBCHTML.hx
-
-out/production/tbc/tbc/TBCTime.hx
-
-*.iml
-*.dump
+.vscode
+test_tbc/bin
+bin
+pyBin

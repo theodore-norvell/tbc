@@ -1,0 +1,53 @@
+-cp src
+
+--each 
+
+-cp docs/demo_0_blog/src
+-main Controller
+
+-js docs/demo_0_blog/bin/controller.js
+
+--next
+
+-cp docs/demo_1_pauses/src
+-main Controller
+
+-js docs/demo_1_pauses/bin/controller.js
+
+--next
+
+-cp docs/demo_2_parallel/src
+-main Controller
+
+-js docs/demo_2_parallel/bin/controller.js
+
+--next
+
+-cp docs/demo_3_hello_world/src
+-main Controller
+
+-js docs/demo_3_hello_world/bin/controller.js
+
+--next
+
+-cp docs/demo_4_jquery/src
+-lib jQueryExtern
+-main Controller
+
+-js docs/demo_4_jquery/bin/controller.js
+
+--next
+
+-cp docs/demo_5_try_the_tm/src
+-main Controller
+
+-js docs/docs/demo_5_try_the_tm/bin/controller.js
+
+--next 
+
+
+-cp docs/demo_6_parallel_for/src
+-lib jQueryExtern
+-main Controller
+
+-js docs/demo_6_parallel_for/bin/controller.js

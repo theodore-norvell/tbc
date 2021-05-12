@@ -1,0 +1,18 @@
+-cp src
+
+tbc.TBC 
+
+--each
+tbc.TBCTime
+-js bin/tbc4Node.js
+
+--next
+tbc.TBCTime
+-python pyBin/tbc.py
+
+--next
+-lib jQueryExtern
+tbc.TBCTime
+tbc.TBCHTML
+tbc.TBCJQuery
+-js bin/tbc4JQ.js

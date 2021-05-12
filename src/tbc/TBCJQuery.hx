@@ -7,8 +7,8 @@ import tbc.TBC.Disabler ;
 import tbc.TBC.exec ;
 
 /** This module requires Andy Li's JQuery extern library */
-import jQuery.JQuery ;
-import jQuery.Event ;
+import js.jquery.JQuery ;
+import js.jquery.Event ;
 
 
 private class JQueryDisabler implements Disabler {
@@ -29,6 +29,7 @@ private class JQueryDisabler implements Disabler {
     }
 }
 
+@:expose
 class JQueryG extends GuardA<Event> {
     var _elements : JQuery  ;
     var _eventName : String ;
@@ -37,7 +38,7 @@ class JQueryG extends GuardA<Event> {
         _elements = elements ;
         _eventName = eventName ; }
 
-    override public function enable( k : Event -> Void ) : Disabler  {
+    override public function enable( k : Event -> Void, h : Dynamic -> Void ) : Disabler  {
         //haxe.Log.trace("enabling:" + _eventName + " on " + _elements);
         _elements.on(_eventName, k) ;
         return new JQueryDisabler( _elements, _eventName, k ) ;
@@ -45,6 +46,7 @@ class JQueryG extends GuardA<Event> {
 }
 
 
+@:expose
 class TBCJQuery {
     public static function jqEvent( elements : JQuery,
                                     eventName : String )
