@@ -271,7 +271,7 @@ class FliteredGuard<E> extends GuardA<E> {
 
 
 /** Interface for guarded processes.
-*
+*  TODO:: Could  GuardedProcessI<A>  extend ProcessI<A> ?
 **/
 @:expose
 interface GuardedProcessI<A> {
@@ -438,7 +438,7 @@ private class AwaitP<A> extends ProcessA<A> {
     var _gp : GuardedProcess<A> ;
 
     public function new( gp : GuardedProcess<A>  ) {
-       _gp = gp ; }
+        _gp = gp ; }
 
     public override function go( k : A -> Void, h : Dynamic -> Void ) {
         var disabler : Disabler = null ;
