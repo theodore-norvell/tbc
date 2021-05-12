@@ -258,9 +258,6 @@ interface GuardedProcessI<A> {
     **/
     public function orElse( gp : GuardedProcessI<A> ) : GuardedProcessI<A> ;
 
-    // Is the guarded process ready to execute now? If so it returns a result
-    public function take() : Null<A> ;
-
     /** Enable the guarded process.
     * If an enabled guarded process fires, it executes the first routine first,
     * then it executes itself, finally it calls k with the result.
@@ -613,11 +610,18 @@ class TBC {
         return exec(fp) >= function(p : Process<A>) { return p ; } ;
     }
 
-//    public static function awaitAny<A>( list : List<GuardedProcess<A>> )
-//    : Process<A> {
-//        return new AwaitP<A>( list ) ; }
+     public static function awaitAny<A>( list : List<GuardedProcess<A>> )
+     : Process<A> {
+         var it = list.iterator() ;
+         if( ! it.hasNext()  )
+             return toss( "TBC.awaitAny: Empty list of alternatives.") ;
+         else {
+             var gp = it.next() ;
+             while( it.hasNext() ) gp = gp || it.next() ;
+             return new AwaitP<A>( gp ) ; }
+     }
 
-    public static function await<A>(
+     public static function await<A>(
                                 gp0 : GuardedProcess<A>,
                                 ?gp1 : GuardedProcess<A>,
                                 ?gp2 : GuardedProcess<A>,
