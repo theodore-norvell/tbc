@@ -22,7 +22,7 @@ Controller.main = function() {
 Controller.onload = function() {
 	var win = window;
 	var doc = win.document;
-	haxe_Log.trace("Last compiled " + "2021-05-27 19:12:22",{ fileName : "docs/demo_4_jquery/src/Controller.hx", lineNumber : 37, className : "Controller", methodName : "onload"});
+	haxe_Log.trace("Last compiled " + "2021-05-27 19:45:06",{ fileName : "docs/demo_4_jquery/src/Controller.hx", lineNumber : 37, className : "Controller", methodName : "onload"});
 	haxe_Log.trace("Started at " + Std.string(new Date()),{ fileName : "docs/demo_4_jquery/src/Controller.hx", lineNumber : 38, className : "Controller", methodName : "onload"});
 	Controller.square = $("#square");
 	Controller.square.css("display","block");

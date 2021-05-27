@@ -43,7 +43,7 @@ Controller.onload = function() {
 	var win = window;
 	var doc = win.document;
 	Controller.outbox = doc.getElementById("outbox");
-	haxe_Log.trace("Last compiled " + "2021-05-27 19:12:20",{ fileName : "docs/demo_2_parallel/src/Controller.hx", lineNumber : 46, className : "Controller", methodName : "onload"});
+	haxe_Log.trace("Last compiled " + "2021-05-27 19:45:04",{ fileName : "docs/demo_2_parallel/src/Controller.hx", lineNumber : 46, className : "Controller", methodName : "onload"});
 	haxe_Log.trace("Started at " + Std.string(new Date()),{ fileName : "docs/demo_2_parallel/src/Controller.hx", lineNumber : 47, className : "Controller", methodName : "onload"});
 	Controller.useCase().go(function(x) {
 	},function(ex) {

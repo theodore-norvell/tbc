@@ -25,7 +25,7 @@ Controller.printStack = function() {
 Controller.onload = function() {
 	var win = window;
 	var doc = win.document;
-	haxe_Log.trace("Last compiled " + "2021-05-27 19:12:24",{ fileName : "docs/demo_6_parallel_for/src/Controller.hx", lineNumber : 39, className : "Controller", methodName : "onload"});
+	haxe_Log.trace("Last compiled " + "2021-05-27 19:45:07",{ fileName : "docs/demo_6_parallel_for/src/Controller.hx", lineNumber : 39, className : "Controller", methodName : "onload"});
 	haxe_Log.trace("Started at " + Std.string(new Date()),{ fileName : "docs/demo_6_parallel_for/src/Controller.hx", lineNumber : 40, className : "Controller", methodName : "onload"});
 	var count = 16;
 	var stage = $("#stage");
@@ -63,15 +63,6 @@ Controller.onload = function() {
 		haxe_Log.trace("Exception " + Std.string(ex),{ fileName : "docs/demo_6_parallel_for/src/Controller.hx", lineNumber : 80, className : "Controller", methodName : "onload"});
 		Controller.printStack();
 	});
-};
-Controller.ballBehaviour = function(i) {
-	var ball = Controller.balls[i];
-	var t = 0;
-	var this1 = tbc_TBCTime.pause(60).sc(tbc_TBC.exec(function() {
-		var x = 240 + 100 * Math.cos((t += 60) / (512 + 4 * i));
-		return ball.css("left",x);
-	}));
-	return tbc_TBC.loop(this1);
 };
 var HxOverrides = function() { };
 HxOverrides.__name__ = true;

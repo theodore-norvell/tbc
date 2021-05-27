@@ -53,7 +53,9 @@ class Controller {
             ) ; }
 
     static function getAndDisplayAnswer() : Process<Triv> { return 
-            await( enter( nameBox ) > getValue( nameBox ) ) >= hello; }
+            await( enter( nameBox ) ) >
+            getValue( nameBox )  >=
+            hello; }
 
     static public function onload() {
         var win = Browser.window ;

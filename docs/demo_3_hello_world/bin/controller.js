@@ -56,8 +56,8 @@ Controller.mainLoop = function() {
 	return tbc_TBC.loop(this2);
 };
 Controller.getAndDisplayAnswer = function() {
-	var this1 = Controller.enter(Controller.nameBox).sc(Controller.getValue(Controller.nameBox));
-	var this2 = tbc_TBC.await(this1).bind(Controller.hello);
+	var this1 = tbc_TBC.await(Controller.enter(Controller.nameBox)).sc(Controller.getValue(Controller.nameBox));
+	var this2 = this1.bind(Controller.hello);
 	return this2;
 };
 Controller.onload = function() {
@@ -66,8 +66,8 @@ Controller.onload = function() {
 	Controller.nameBox = js_Boot.__cast(doc.getElementById("nameBox") , HTMLInputElement);
 	Controller.question = doc.getElementById("question");
 	Controller.reply = doc.getElementById("reply");
-	haxe_Log.trace("Last compiled " + "2021-05-27 19:12:21",{ fileName : "docs/demo_3_hello_world/src/Controller.hx", lineNumber : 65, className : "Controller", methodName : "onload"});
-	haxe_Log.trace("Started at " + Std.string(new Date()),{ fileName : "docs/demo_3_hello_world/src/Controller.hx", lineNumber : 66, className : "Controller", methodName : "onload"});
+	haxe_Log.trace("Last compiled " + "2021-05-27 19:45:05",{ fileName : "docs/demo_3_hello_world/src/Controller.hx", lineNumber : 67, className : "Controller", methodName : "onload"});
+	haxe_Log.trace("Started at " + Std.string(new Date()),{ fileName : "docs/demo_3_hello_world/src/Controller.hx", lineNumber : 68, className : "Controller", methodName : "onload"});
 	tbc_Process.run(Controller.mainLoop());
 };
 Controller.hello = function(name) {

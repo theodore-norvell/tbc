@@ -61,7 +61,7 @@ Controller.onload = function() {
 	Controller.b1a = doc.getElementById("button:oneA");
 	Controller.b1b = doc.getElementById("button:oneB");
 	Controller.b2 = doc.getElementById("button:two");
-	haxe_Log.trace("Last compiled " + "2021-05-27 19:12:20",{ fileName : "docs/demo_1_pauses/src/Controller.hx", lineNumber : 67, className : "Controller", methodName : "onload"});
+	haxe_Log.trace("Last compiled " + "2021-05-27 19:45:03",{ fileName : "docs/demo_1_pauses/src/Controller.hx", lineNumber : 67, className : "Controller", methodName : "onload"});
 	haxe_Log.trace("Started at " + Std.string(new Date()),{ fileName : "docs/demo_1_pauses/src/Controller.hx", lineNumber : 68, className : "Controller", methodName : "onload"});
 	Controller.useCase().go(function(x) {
 	},function(ex) {
