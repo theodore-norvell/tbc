@@ -24,13 +24,13 @@
        <p>The TBC code is as follows.</p>
        <pre>
        loop(
-            await( click( b0 ) &amp;&amp; out("0")  ) &gt;
+            await( click( b0 ) &gt; out("0")  ) &gt;
             await(
-                click( b1a ) &amp;&amp; out("1A")
+                click( b1a ) &gt; out("1A")
             ,
-                click( b1b ) &amp;&amp; out("1B")
+                click( b1b ) &gt; out("1B")
             ) &gt;
-            await( click( b2 ) &amp;&amp; out("2" )
+            await( click( b2 ) &gt; out("2" )
         )
        </pre>
        <p>The haxe code is <a href="src/Controller.hx">here</a>.</p>

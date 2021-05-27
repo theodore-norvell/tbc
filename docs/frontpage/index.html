@@ -11,7 +11,50 @@
 <h1>Take Back Control</h1>
 <p>Take Back Control (TBC) is a library for writing event-driven code in a style that uses standard control structures.</p>
 <p> A number of demos can be found below.</p>
-<p> <a href=http://theodore-norvell.github.io/tbc/>Learn more here.</a>
+<p> <a href="http://theodore-norvell.github.io/tbc/">Learn more here.</a> </p>
+<h2><a id="notation"></a>New notation.</h2>
+<p> Since the first Blog posts were written, the &gt;&gt; operator has been deprecated in favour of &gt;=,
+    which can now take a guard as its left operand, and the &amp;&amp; operator has been deprecated in favour of &gt;&gt;
+    which can now take a guard as its left operand too.  Similarly for guards, the .guarding method is deprecated in favour
+    of .bing and the .andThen method is deprecated in favour of the (new) .sc method.  Furthermore guards can now be
+    used anywhere that guarded processes are used.  A guard is simply a guarded process that does nothing and outputs
+    the event.
+</p>
+<p>Assuming that the following variables have the type indicated,</p>
+<table>
+<tr><td><strong>Variable</strong></td><td><strong>Type</strong></td></tr>
+<tr><td>g1, g2</td><td>Guard&lt;A&gt;</td></tr>
+<tr><td>gp1. gp2</td><td>GuardedProcess&lt;A&gt;</td></tr>
+<tr><td>p1</td><td>Process&lt;A&gt;</td></tr>
+<tr><td>p2</td><td>Process&lt;B&gt;</td></tr>
+<tr><td>f</td>         <td>A -&gt; Process&lt;B&gt;</td></tr>
+<tr><td>c</td>         <td>A -&gt; Bool</td></tr>
+<tr><td>lf</td>         <td>(Void -&gt; Process&lt;A&gt;) -&gt; Process&lt;A&gt;</td></tr>
+<tr><td>r</td>         <td>Void -&gt; Process&lt;A&gt;</td></tr>
+</table>
+<p>
+  then the following expressions make sense and have the type indicated.
+</p>
+<table>
+  <tr><td><strong>Expression</strong></td><td><strong>Method notation</strong></td><td><strong>Type</strong></td></tr>
+  <tr><td>g1 &amp; c</td>   <td>g1.filter( c )</td>  <td>Guard&lt;A&gt;</td></tr>
+  <tr><td>g1 &gt;= f</td>   <td>g1.bind( f )</td>  <td>Process&lt;B&gt;</td></tr>
+  <tr><td>gp1 &gt;= f</td>  <td>gp1.bind( f )</td>  <td>Process&lt;B&gt;</td></tr>
+  <tr><td>p1 &gt;= f</td>   <td>p1.bind( f )</td>  <td>Process&lt;B&gt;</td></tr>
+  <tr><td>g1 &gt; p2</td>   <td>g1.sc( p2 )</td>  <td>GuardedProcess&lt;B&gt;</td></tr>
+  <tr><td>gp1 &gt; p2</td>  <td>gp1.sc( p2 )</td>  <td>GuardedProcess&lt;B&gt;</td></tr>
+  <tr><td>p1 &gt; p2</td>   <td>p1.sc( p2 )</td>  <td>Process&lt;B&gt;</td></tr>
+  <tr><td>g1 || g2</td>     <td>g1.orElse( g2 )</td>  <td>GuardedProcess&lt;A&gt;</td></tr>
+  <tr><td>gp1 || g2</td>    <td>gp1.orElse( g2 )</td>  <td>GuardedProcess&lt;A&gt;</td></tr>
+  <tr><td>g1 || gp2</td>    <td>g1.orElse( gp2 )</td>  <td>GuardedProcess&lt;A&gt;</td></tr>
+  <tr><td>gp1 || gp2</td>   <td>gp1.orElse( gp2 )</td>  <td>GuardedProcess&lt;A&gt;</td></tr>
+  <tr><td>await( g )</td>   <td></td>  <td>Process&lt;A&gt;</td></tr>
+  <tr><td>await( gp1 )</td>  <td></td>  <td>Process&lt;A&gt;</td></tr>
+  <tr><td>loop( p1 )</td>    <td></td>  <td>Process&lt;Triv&gt;</td></tr>
+  <tr><td>fix( lf )</td>    <td></td>  <td>Process&lt;A&gt;</td></tr>
+  <tr><td>repeat( r )</td>    <td></td>  <td>Process&lt;A&gt;</td></tr>
+</table>
+
 <h2><a id="demos"></a>Demos</h2>
 <ul>
   <li><a href="../demo_0_blog/index.html">Demo 0. Introducing TBC.</a>

@@ -119,7 +119,7 @@ private class ThenP<A,B> extends ProcessA<B> {
     var _right : A -> Process<B> ;
 
     public function new( left : Process<A>, right : A -> Process<B> ) {
-       _left = left ; _right = right ; }
+        _left = left ; _right = right ; }
 
     public override function go( f : B -> Void, h : Dynamic -> Void ) {
         _left.go( function(a:A) _right(a).go(f, h), h) ; }
@@ -179,28 +179,49 @@ interface Disabler {
 }
 
 /** An interface for Guards.
-*
 **/
 @:expose
-interface GuardI<E> {
+interface GuardI<E> extends GuardedProcessI<E> {
+
+
     /** Enable the guard.
     * When fired, the guard will execute k. **/
     public function enable( k : E -> Void, h : Dynamic -> Void ) : Disabler  ;
-    /** Create a guarded process. **/
+
+    /** Create a guarded process. Deprecated in favour of bind. **/
+    @:deprecated
     public function guarding<A>( k : E -> Process<A> ) : GuardedProcess<A> ;
-    /** Create a guarded process. **/
+
+    /** Create a guarded process. Deprecated in fovour of sc. **/
+    @:deprecated
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> ;
+
     /** Create a guard that is conditional on some condition. */
     public function filter( c : E -> Bool ) : GuardI<E> ;
 }
 
 /** An abstract type that enhances GuardI<E> by adding
-* operator overloads >> and && and & .
-*
+ * operator overloads for >=, >, >>, && and & .
+ *
+ * Note that all guards are guarded processes and so the following
+ * operations are possible where g is a guard: 
+ *    g >= f    --wait for event e, then do f(e) 
+ *    g > p     --wait for event e, then do p
+ *    g || gp   --choose
+ *    gp || g   --choose
+ *    await( g )  -- wait for event
+ * The following operations are particular to guards
+ *    g & f   --filter event with predicate f
+ *    g >> f  (equivalent to g >= f, but with higher precedence than &)
+ *    g && p  (equivalent to g > p, but with lower precedence than >)
+ *  TODO. Consider adding a | operator.
 **/
 @:expose
-abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
-
+abstract Guard<E>( GuardI<E> )
+    to GuardI<E>
+    from GuardI<E>
+    to GuardedProcess<E>   // Allows a Guard to be used where a GuardedProcess is expected. E.g. in await.
+{
     public inline function new(g : GuardI<E>) {
         this = g;
     }
@@ -209,17 +230,20 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
     public inline function enable( k : E -> Void, h : Dynamic -> Void ) : Disabler {
         return (this:GuardI<E>).enable( k, h ) ; }
 
-    /** See GuardI.guarding **/
+    /** See GuardI.guarding.
+     * Possibly this should be deprecated. Especially as it has higher precedence than & and |. **/
     @:op( A >> B )
+    @:deprecated
     public inline function guarding<A>( k : E -> Process<A> )
         : GuardedProcess<A> {
-        return (this:GuardI<E>).guarding( k ) ;
+        return (this:GuardI<E>).bind( k ) ;
     }
 
     /** See GuardI.andThen **/
     @:op( A && B )
+    @:deprecated
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> {
-        return (this:GuardI<E>).andThen( p ) ;
+        return (this:GuardI<E>).sc( p ) ;
     }
 
     /** See GuardI.filter **/
@@ -227,6 +251,33 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
     public function filter( c : E -> Bool ) : Guard<E> {
         return (this:GuardI<E>).filter( c ) ;
     }
+
+    /* -----------------------* /
+    /* Below this line we have methods essentially copied from GuardedProcess<E>. */
+
+    /** See GuardedProcessI.bind */
+    @:op( A >= B )
+    public inline function bind<B>( f : E -> Process<B> ) : GuardedProcess<B> {
+        return new GuardedProcess<B>( (this:GuardI<E>).bind(f) );
+    }
+
+    /** See GuardedProcessI.sc */
+    @:op( A > B )
+    public inline function sc<B>( q : Process<B> ) : GuardedProcess<B> {
+        return new GuardedProcess<B>( (this:GuardI<E>).sc( q ) ) ;
+    }
+
+    /** See GuardedProcessI.orElse */
+    @:op( A || B )
+    public inline function orElse( gp : GuardedProcess<E> ) : GuardedProcess<E> {
+        return new GuardedProcess<E>( (this:GuardI<E>).orElse( gp ) ) ;
+    }
+
+    /** See GuardedProcessI.enableGP */
+    public inline function enableGP( first : Void -> Void, k : E -> Void, h : Dynamic -> Void ) : Disabler {
+        return (this:GuardI<E>).enableGP( first, k, h) ;
+    }
+
 }
 
 
@@ -235,18 +286,32 @@ abstract Guard<E>( GuardI<E> ) to GuardI<E> from GuardI<E> {
 * .enable.
 **/
 @:expose
-class GuardA<E> implements GuardI<E> {
+class GuardA<E> implements GuardI<E> extends GuardedProcessA<E> {
     public function enable( k : E -> Void, h : Dynamic -> Void ) : Disabler {
         h("Method enable not overridden in " + this) ; return null ; }
+    
+    override
+    public function enableGP( first : Void -> Void, k : E -> Void, h : Dynamic -> Void ) : Disabler {
+            return enable(
+                function( e : E) {
+                    first() ;
+                    TBC.unit(e).go( k, h ) ; },
+                h ) ; }
+    
+    /** use bind instead */
+    @:deprecated
+    public function guarding<A>( f : E -> Process<A> ) : GuardedProcess<A> {
+        return this.bind(f) ; }
 
-    public function guarding<A>( k : E -> Process<A> ) : GuardedProcess<A> {
-        return new GuardedProcessC<A,E>( this, k ) ; }
-
+    /** use sc instead */
+    @:deprecated
     public function andThen<A>( p : Process<A> ) : GuardedProcess<A> {
-        return this.guarding( function( ev : E ) { return p ; } ) ; }
+        return this.sc( p ) ; }
 
     public function filter( c : E -> Bool ) : GuardI<E> {
         return new FliteredGuard<E>( this, c ) ; }
+
+    
 }
 
 @:expose
@@ -295,7 +360,7 @@ interface GuardedProcessI<A> {
     * If an enabled guarded process fires, it executes the first routine first,
     * then it executes itself, finally it calls k with the result.
     **/
-    public function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler ;
+    public function enableGP( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler ;
 
 }
 
@@ -310,29 +375,29 @@ to GuardedProcessI<A> from GuardedProcessI<A> {
     /** See GuardedProcessI.bind */
     @:op( A >= B )
     public inline function bind<B>( f : A -> Process<B> ) : GuardedProcess<B> {
-        return new GuardedProcess<B>( (this:GuardedProcessI<A>).bind( (f:A -> Process<B>) ) ) ;
+        return new GuardedProcess<B>( (this:GuardedProcessI<A>).bind( f ) ) ;
     }
 
     /** See GuardedProcessI.sc */
     @:op( A > B )
     public inline function sc<B>( q : Process<B> ) : GuardedProcess<B> {
-        return new GuardedProcess<B>( (this:GuardedProcessI<A>).sc( (q:Process<B>) ) ) ;
+        return new GuardedProcess<B>( (this:GuardedProcessI<A>).sc( q ) ) ;
     }
 
     /** See GuardedProcessI.orElse */
     @:op( A || B )
     public inline function orElse( gp : GuardedProcess<A> ) : GuardedProcess<A> {
-        return new GuardedProcess<A>( (this:GuardedProcessI<A>).orElse( (gp : GuardedProcess<A>) ) ) ;
+        return new GuardedProcess<A>( (this:GuardedProcessI<A>).orElse( gp ) ) ;
     }
 
-    public inline function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler {
-        return (this:GuardedProcessI<A>).enable( first, k, h) ;
+    public inline function enableGP( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler {
+        return (this:GuardedProcessI<A>).enableGP( first, k, h) ;
     }
 }
 
 /** An "abstract class" for guarded processes.
 * "Concrete guarded process classes will extend off this class while
-* overriding the enable method.
+* overriding the enableGP method.
 **/
 @:expose
 class GuardedProcessA<A> implements GuardedProcessI<A>{
@@ -359,25 +424,8 @@ class GuardedProcessA<A> implements GuardedProcessI<A>{
     }
 
     /** Enable the guard associated with the guarded process. */
-    public function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler  {
-        h("enable is not defined in "+this) ; return null ; }
-}
-
-/** A guarded process made from a Guard<E> and a function E->Process<A>
-*
-**/
-private class  GuardedProcessC<A,E> extends GuardedProcessA<A> {
-    var _guard : Guard<E> ;
-    var _f : E -> Process<A> ;
-    public function new( guard: Guard<E>, f : E -> Process<A> ) {
-        _guard = guard ; _f = f ; }
-
-    override public function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler {
-        return _guard.enable(
-            function( e : E) {
-                first() ;
-                _f(e).go( k, h ) ; },
-            h ) ; }
+    public function enableGP( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler  {
+        h("enableGP is not defined in "+this) ; return null ; }
 }
 
 /** A guarded process made from a GuardedProcess<A> and a function A->Process<B>.
@@ -391,8 +439,8 @@ private class  ThenGP<A,B> extends GuardedProcessA<B> {
         _gp = gp ;
         _f = f ; }
 
-    override public function enable( first : Void -> Void, k : B -> Void, h : Dynamic -> Void ) : Disabler {
-        return _gp.enable(first,
+    override public function enableGP( first : Void -> Void, k : B -> Void, h : Dynamic -> Void ) : Disabler {
+        return _gp.enableGP(first,
             function( a : A) {
                 _f(a).go( k, h ) ; },
             h) ; }
@@ -409,9 +457,9 @@ private class  ChoiceGP<A> extends GuardedProcessA<A> {
         _gp0 = gp0 ;
         _gp1 = gp1 ; }
 
-    override public function enable( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler {
-        var d0 = _gp0.enable(first, k, h ) ;
-        var d1 = _gp1.enable(first, k, h ) ;
+    override public function enableGP( first : Void -> Void, k : A -> Void, h : Dynamic -> Void ) : Disabler {
+        var d0 = _gp0.enableGP(first, k, h ) ;
+        var d1 = _gp1.enableGP(first, k, h ) ;
         return new ChoiceDisabler( d0, d1 ) ;
     }
 
@@ -445,7 +493,7 @@ private class AwaitP<A> extends ProcessA<A> {
         function disable() {
             disabler.disable() ;
         }
-        disabler = _gp.enable(disable, k, h) ;
+        disabler = _gp.enableGP(disable, k, h) ;
     }
 }
 
@@ -691,4 +739,12 @@ class TBC {
         if( gp4 != null ) gp = gp || gp4 ;
         if( gp5 != null ) gp = gp || gp5 ;
         return new AwaitP<A>( gp ) ; }
+
+    function test(g1 : Guard<Int>, g2 : Guard<Int>, gp : GuardedProcess<Int> ) : Process<Int> {
+        var a =  await( g1 ) ;
+        var b = await( g1 || g2 ) ;
+        var c = await( g1 || gp ) ;
+        var d = await( gp || g2 ) ;
+        return a > b > c > d ;
+    }
 }

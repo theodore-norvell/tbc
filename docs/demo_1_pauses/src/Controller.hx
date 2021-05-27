@@ -36,22 +36,22 @@ class Controller {
         loop(
             nag( ) >
             await(
-                click( b1a ) && out("1A")
+                click( b1a ) > out("1A")
             ||
-                click( b1b ) && out("1B")
+                click( b1b ) > out("1B")
             ||
-                timeout( 2000 ) && out( "too slow" )
+                timeout( 2000 ) > out( "too slow" )
             ) >
             pause(1000) >
-            await( click( b2 ) && out("2") )
+            await( click( b2 ) > out("2") )
         ) ; }
 
     static function nag() : Process<Triv>{
         function f(repeat : Void -> Process<Triv>) : Process<Triv> { return
             await(
-                click(b0) && out("0")
+                click(b0) > out("0")
             ||
-                timeout( 1500 ) && nagTheUser() > invoke(repeat)
+                timeout( 1500 ) > nagTheUser() > invoke(repeat)
             ) ; }
         return fix( f ) ;
     }

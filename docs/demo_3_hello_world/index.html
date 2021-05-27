@@ -35,7 +35,7 @@
         <p>where <kbd>getAndDisplayAnswer</kbd> is defined by</p>
         <pre>
         static function getAndDisplayAnswer( ) : Process&lt;Triv&gt; { return
-            await( enter( nameBox ) &amp;&amp; getValue( nameBox ) ) &gt;= hello ;
+            await( enter( nameBox ) &gt; getValue( nameBox ) ) &gt;= hello ;
         }
 
         static function hello( name : String ) { return

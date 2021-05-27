@@ -47,9 +47,9 @@ class Controller {
         var p =
             loop  (
                 await(
-                    upKey(body) >> preventDefault > exec( bigger )
+                    upKey(body) >= preventDefault > exec( bigger )
                 ,
-                    downKey(body) >> preventDefault > exec( smaller )
+                    downKey(body) >= preventDefault > exec( smaller )
                 )
             ) ;
         // Execute p

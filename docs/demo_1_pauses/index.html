@@ -26,14 +26,14 @@
         loop(
             nag( ) &gt;
             await(
-                click( b1a ) &amp;&amp; out("1A")
+                click( b1a ) &gt; out("1A")
             ||
-                click( b1b ) &amp;&amp; out("2B")
+                click( b1b ) &gt; out("2B")
             ||
-                timeout( 2000 ) &amp;&amp; out( "too slow" )
+                timeout( 2000 ) &gt; out( "too slow" )
             ) &gt;
             pause(2000) &gt;
-            await( click( b2 ) &amp;&amp; out("2") )
+            await( click( b2 ) &gt; out("2") )
         )
         </pre>
         <p>A subtle change from <a href="../demo_0_blog">Demo 0</a> is
@@ -47,9 +47,9 @@
         static function nag() : Process&lt;Triv&gt; {
             function f(repeat : Void -&gt; Process&lt;Triv&gt;) : Process&lt;Triv&gt; { return
                 await(
-                    click(b0) &amp;&amp; out("0")
+                    click(b0) &gt; out("0")
                 ||
-                    timeout(1500) &amp;&amp; nagTheUser() &gt; invoke(repeat)
+                    timeout(1500) &gt; nagTheUser() &gt; invoke(repeat)
                 ) ; }
             return fix( f ) ;
         }
@@ -82,9 +82,9 @@
         <pre>
         static function nag() : Process&lt;Triv&gt;{ return
             await(
-                click(b0) &amp;&amp; exec(thankTheUser)
+                click(b0) &gt; exec(thankTheUser)
             ||
-                timeout(1500) &amp;&amp; exec(nagTheUser) &gt; invoke(nag)
+                timeout(1500) &gt; exec(nagTheUser) &gt; invoke(nag)
             ) ; }
         }        </pre>
         <p>

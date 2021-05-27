@@ -33,13 +33,13 @@ class Controller {
 
     static function useCase() : Process<Triv> { return
         loop(
-            await( click( b0 ) && out("0")  ) >
+            await( click( b0 ) > out("0")  ) >
             await(
-                click( b1a ) && out("1A")
+                click( b1a ) > out("1A")
             ,
-                click( b1b ) && out("1B")
+                click( b1b ) > out("1B")
             ) >
-            await( click( b2 ) && out("2") )
+            await( click( b2 ) > out("2") )
         ) ; }
 
     static public function onload() {

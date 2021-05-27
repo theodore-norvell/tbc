@@ -15,21 +15,20 @@
         </p>
         <p>The TBC code is as follows.</p>
         <pre>
-            parFor( count, ballBehaviour ) ;
-        </pre>
-        where ballBehaviour is defined by
-        <pre>
-    static function ballBehaviour( i : Int ) : Process<Triv> {
-        var ball = balls[i] ;
-        var t = 0 ;
-        return loop(
-            pause( 60 ) >
-            exec( () -> { t = t + 60 ;
-                          var x = 250-10 + 100 * Math.cos( t / (512+4*i) ) ;
-                          ball.css( "left", x ) ;
-                        } ) 
-        ) ;
-    }
+            parFor( count, 
+                    (i : Int) -&gt; {
+                        var ball = balls[i] ;
+                        var t = 0 ;
+                        loop( pause( 60 ) &gt;
+                              exec( () -&gt; {
+                                        t = t + 60 ;
+                                        var x = 250-10 + 100 * Math.cos( t / (512+4*i) ) ;
+                                        ball.css( "left", x ) ;
+                                    }
+                                  ) 
+                            ) ;
+                    }
+            ) ;
         </pre>
         <div id="stage">
 

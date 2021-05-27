@@ -53,8 +53,7 @@ class Controller {
             ) ; }
 
     static function getAndDisplayAnswer() : Process<Triv> { return 
-            await( enter( nameBox ) && getValue( nameBox ) ) >= (name:String) ->
-            hello(name) ; }
+            await( enter( nameBox ) > getValue( nameBox ) ) >= hello; }
 
     static public function onload() {
         var win = Browser.window ;
@@ -82,9 +81,9 @@ class Controller {
     static function getAndDisplayAnswer1( ) : Process<Triv> {
         function f( top : Void -> Process<Triv> ) : Process<Triv> { return
             await(
-                enter( nameBox ) && getValue( nameBox ) >= hello
+                enter( nameBox ) > getValue( nameBox ) >= hello
             ||
-                timeout(5000) && flash(question) > invoke(top)
+                timeout(5000) > flash(question) > invoke(top)
             ) ;
         }
         return fix( f ) ;

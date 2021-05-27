@@ -165,9 +165,9 @@ class Controller {
 
     static function initialState() : Process<Triv> { return
         await(
-            change(radio[CPP]) && unit(CPP)
+            change(radio[CPP]) > unit(CPP)
         ||
-            change(radio[JAVA]) && unit(JAVA)
+            change(radio[JAVA]) > unit(JAVA)
         ) >=
         function(lang : Int) { return
             showEditor(lang) >
@@ -179,18 +179,18 @@ class Controller {
     }
 
     static function changeLang( toLang : Int ) { return
-        change(radio[toLang]) &&
+        change(radio[toLang]) >
         showEditor(toLang) >
         unit(toLang) >= editingState ;
     }
 
     static function run( lang : Int ) { return
-        click(runButton[lang]) &&
+        click(runButton[lang]) >
         showPopupP( loadWarning ) >
         showTM() >
         sendToTM(lang) >
         hidePopupP( loadWarning ) >
-        await( click(editButton) && hideTM() ) >
+        await( click(editButton) > hideTM() ) >
         unit(lang) >= editingState ;
     }
 

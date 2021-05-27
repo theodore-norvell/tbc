@@ -28,9 +28,9 @@
         var p =
             loop  (
                 await(
-                    upKey(body) &gt;&gt; preventDefault &gt; exec( bigger )
+                    upKey(body) &gt;= preventDefault &gt; exec( bigger )
                 ,
-                    downKey(body) &gt;&gt; preventDefault &gt; exec( smaller )
+                    downKey(body) &gt;= preventDefault &gt; exec( smaller )
                 )
             ) ;
         </pre>

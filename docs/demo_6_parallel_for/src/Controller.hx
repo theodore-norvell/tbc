@@ -60,25 +60,26 @@ class Controller {
             balls.push(ball) ;
         }
 
-        var p = parFor( count, ballBehaviour ) ;
+        var p = parFor( count, 
+                        (i : Int) -> {
+                            var ball = balls[i] ;
+                            var t = 0 ;
+                            loop(
+                                pause( 60 ) >
+                                exec( () -> { t = t + 60 ;
+                                            var x = 250-10 + 100 * Math.cos( t / (512+4*i) ) ;
+                                            ball.css( "left", x ) ;
+                                            } ) 
+                            ) ; }
+                ) ;
+
+
+
         p.go( function(x:Vector<Triv>) {},
               function( ex : Dynamic ) {
                     trace( "Exception " + ex ) ;
                     printStack() ; }
             ) ;
     }
-
-    static function ballBehaviour( i : Int ) : Process<Triv> {
-        var ball = balls[i] ;
-        var t = 0 ;
-        return loop(
-            pause( 60 ) >
-            exec( () -> { t = t + 60 ;
-                          var x = 250-10 + 100 * Math.cos( t / (512+4*i) ) ;
-                          ball.css( "left", x ) ;
-                        } ) 
-        ) ;
-    }
-
 
 }
